@@ -1,0 +1,25 @@
+{
+  "name": "core-website-framework",
+  "version": "1.0.0",
+  "description": "A flexible website framework designed to host multiple utilities and tools with live-reload development server",
+  "main": "scripts/dev-server.js",
+  "scripts": {
+    "dev": "cd scripts && node dev-server.js",
+    "start": "cd scripts && node dev-server.js",
+    "build": "cd scripts && node build.js"
+  },
+  "keywords": [
+    "website",
+    "framework",
+    "development",
+    "live-reload",
+    "utilities"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "chokidar": "^3.5.3",
+    "ws": "^8.13.0"
+  }
+}
