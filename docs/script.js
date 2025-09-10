@@ -58,22 +58,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // Theme switching functionality
     const themeRadios = document.querySelectorAll('input[name="theme"]');
     
-    function applyTheme(theme, showNotification = true) {
+    function applyTheme(theme) {
         document.body.setAttribute('data-theme', theme);
         localStorage.setItem('preferred-theme', theme);
-        
-        // Only show notification if explicitly requested (user-initiated change)
-        if (showNotification) {
-            showNotification(`Switched to ${theme} mode`, 'success');
-        }
     }
 
-    // Load saved theme preference (without notification)
+    // Load saved theme preference
     const savedTheme = localStorage.getItem('preferred-theme') || 'light';
     const savedThemeRadio = document.querySelector(`input[name="theme"][value="${savedTheme}"]`);
     if (savedThemeRadio) {
         savedThemeRadio.checked = true;
-        applyTheme(savedTheme, false); // Don't show notification on page load
+        applyTheme(savedTheme);
     }
 
     // Add theme change listeners
@@ -85,79 +80,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Notification settings
-    const notificationCheckbox = document.querySelector('input[type="checkbox"]');
-    
-    // Load saved notification preference
-    const savedNotificationPref = localStorage.getItem('notifications-enabled');
-    if (savedNotificationPref !== null) {
-        notificationCheckbox.checked = savedNotificationPref === 'true';
-    }
-
-    // Save notification preference
-    if (notificationCheckbox) {
-        notificationCheckbox.addEventListener('change', function() {
-            localStorage.setItem('notifications-enabled', this.checked);
-            
-            if (this.checked) {
-                showNotification('Notifications enabled', 'success');
-            } else {
-                showNotification('Notifications disabled', 'info');
-            }
-        });
-    }
-
-    // Utility function to show notifications
-    function showNotification(message, type = 'info') {
-        // Create notification element
-        const notification = document.createElement('div');
-        notification.className = `notification notification-${type}`;
-        notification.textContent = message;
-        
-        // Style the notification
-        Object.assign(notification.style, {
-            position: 'fixed',
-            top: '20px',
-            right: '20px',
-            padding: '1rem 1.5rem',
-            borderRadius: '8px',
-            color: 'white',
-            fontWeight: '500',
-            zIndex: '10000',
-            opacity: '0',
-            transform: 'translateX(100%)',
-            transition: 'all 0.3s ease'
-        });
-
-        // Set background color based on type
-        const colors = {
-            success: '#28a745',
-            error: '#dc3545',
-            warning: '#ffc107',
-            info: '#17a2b8'
-        };
-        notification.style.backgroundColor = colors[type] || colors.info;
-
-        // Add to page
-        document.body.appendChild(notification);
-
-        // Animate in
-        setTimeout(() => {
-            notification.style.opacity = '1';
-            notification.style.transform = 'translateX(0)';
-        }, 100);
-
-        // Remove after 3 seconds
-        setTimeout(() => {
-            notification.style.opacity = '0';
-            notification.style.transform = 'translateX(100%)';
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.parentNode.removeChild(notification);
-                }
-            }, 300);
-        }, 3000);
-    }
 
     // Add smooth scrolling for better UX
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -203,7 +125,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Expose utility functions globally for future use
     window.CoreFramework = {
         switchTab: switchTab,
-        showNotification: showNotification,
         showLoading: window.showLoading,
         hideLoading: window.hideLoading
     };
