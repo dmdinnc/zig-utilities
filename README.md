@@ -28,7 +28,7 @@ cd scripts && node dev-server.js
 
 The server will:
 - 🚀 Start on http://localhost:3000
-- 👀 Watch for file changes in the `website/` directory
+- 👀 Watch for file changes in the `docs/` directory
 - 🔄 Automatically reload the browser when files change
 - 🎨 Hot-reload CSS without full page refresh
 

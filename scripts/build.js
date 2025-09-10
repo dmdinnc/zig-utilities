@@ -3,7 +3,7 @@ const path = require('path');
 
 class WebsiteBuilder {
     constructor(options = {}) {
-        this.sourceDir = options.sourceDir || '../website';
+        this.sourceDir = options.sourceDir || '../docs';
         this.buildDir = options.buildDir || '../dist';
         this.minify = options.minify !== false;
     }
@@ -160,7 +160,7 @@ Core Website Framework - Build Tool
 Usage: node build.js [options]
 
 Options:
-  -s, --source <path>    Source directory (default: website)
+  -s, --source <path>    Source directory (default: docs)
   -o, --output <path>    Output directory (default: dist)
   --no-minify           Skip minification
   -h, --help            Show this help message

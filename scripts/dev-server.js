@@ -8,7 +8,7 @@ const fs = require('fs');
 class LiveReloadServer {
     constructor(options = {}) {
         this.port = options.port || 3000;
-        this.websiteDir = options.websiteDir || '../website';
+        this.websiteDir = options.websiteDir || '../docs';
         this.watchPatterns = options.watchPatterns || ['**/*.html', '**/*.css', '**/*.js'];
         
         this.app = express();
@@ -212,7 +212,7 @@ Usage: node dev-server.js [options]
 
 Options:
   -p, --port <number>    Port number (default: 3000)
-  -d, --dir <path>       Website directory (default: website)
+  -d, --dir <path>       Website directory (default: docs)
   -h, --help             Show this help message
 
 Features:

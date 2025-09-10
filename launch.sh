@@ -13,7 +13,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-WEBSITE_DIR="website"
+WEBSITE_DIR="docs"
 PORT=8080
 BROWSER_OPEN=true
 
