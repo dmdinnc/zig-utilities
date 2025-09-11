@@ -260,20 +260,43 @@ function initializeHexEditor() {
     function generateHexBoard() {
         const coords = generateHexCoordinates(hexRadius);
         const hexSize = 20;
-        const boardSize = (hexRadius * 2 + 1) * hexSize * 2;
-        const centerX = boardSize / 2;
-        const centerY = boardSize / 2;
+        const padding = 12; // 12px padding from edges
+        
+        // Calculate actual bounds of the hex grid
+        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+        coords.forEach(coord => {
+            const pixel = hexToPixel(coord.q, coord.r, hexSize);
+            // Account for actual hex dimensions (flat-top hexagon)
+            const hexWidth = hexSize * Math.sqrt(3);
+            const hexHeight = hexSize * 2;
+            minX = Math.min(minX, pixel.x - hexWidth/2);
+            maxX = Math.max(maxX, pixel.x + hexWidth/2);
+            minY = Math.min(minY, pixel.y - hexHeight/2);
+            maxY = Math.max(maxY, pixel.y + hexHeight/2);
+        });
+        
+        const gridWidth = maxX - minX;
+        const gridHeight = maxY - minY;
+        
+        // Calculate tight bounds with padding
+        const viewBoxWidth = gridWidth + (padding * 2);
+        const viewBoxHeight = gridHeight + (padding * 2);
+        
+        // Center the grid in the viewBox
+        const offsetX = -minX + padding;
+        const offsetY = -minY + padding;
 
         // Update SVG viewBox and background
-        hexBoard.setAttribute('viewBox', `0 0 ${boardSize} ${boardSize}`);
+        hexBoard.setAttribute('viewBox', `${-offsetX} ${-offsetY} ${viewBoxWidth} ${viewBoxHeight}`);
         hexBoard.style.backgroundColor = backgroundColor;
+        
         
         // Clear existing hexagons
         hexBoard.innerHTML = '';
 
         coords.forEach(coord => {
             const pixel = hexToPixel(coord.q, coord.r, hexSize);
-            const hexPath = generateHexPath(centerX + pixel.x, centerY + pixel.y, hexSize);
+            const hexPath = generateHexPath(pixel.x, pixel.y, hexSize);
             
             const hexElement = document.createElementNS('http://www.w3.org/2000/svg', 'path');
             hexElement.setAttribute('d', hexPath);
@@ -301,8 +324,8 @@ function initializeHexEditor() {
                     const circleId = `circle-${coordKey.replace(/,/g, '_').replace(/-/g, 'n')}`;
                     const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
                     circle.setAttribute('id', circleId);
-                    circle.setAttribute('cx', centerX + pixel.x);
-                    circle.setAttribute('cy', centerY + pixel.y);
+                    circle.setAttribute('cx', pixel.x);
+                    circle.setAttribute('cy', pixel.y);
                     circle.setAttribute('r', hexSize * 0.4);
                     circle.setAttribute('fill', savedCircleColor);
                     circle.style.pointerEvents = 'none';
@@ -334,8 +357,8 @@ function initializeHexEditor() {
                 if (currentColor !== 'transparent') {
                     const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
                     circle.setAttribute('id', circleId);
-                    circle.setAttribute('cx', centerX + pixel.x);
-                    circle.setAttribute('cy', centerY + pixel.y);
+                    circle.setAttribute('cx', pixel.x);
+                    circle.setAttribute('cy', pixel.y);
                     circle.setAttribute('r', hexSize * 0.4); // Larger circle
                     circle.setAttribute('fill', currentColor);
                     circle.style.pointerEvents = 'none'; // Don't interfere with hex clicks
@@ -564,14 +587,11 @@ function initializeHexEditor() {
     }
 
     function createLineElement(startPixel, endPixel, color, width, type, isPreview) {
-        const boardSize = (hexRadius * 2 + 1) * 20 * 2;
-        const centerX = boardSize / 2;
-        const centerY = boardSize / 2;
-        
-        const x1 = centerX + startPixel.x;
-        const y1 = centerY + startPixel.y;
-        const x2 = centerX + endPixel.x;
-        const y2 = centerY + endPixel.y;
+        // Use the same coordinate system as the hex board (no offset needed)
+        const x1 = startPixel.x;
+        const y1 = startPixel.y;
+        const x2 = endPixel.x;
+        const y2 = endPixel.y;
         
         const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         // Enable pointer events for lines (but not for preview lines)
