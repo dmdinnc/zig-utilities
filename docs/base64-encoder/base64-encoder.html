@@ -1,0 +1,51 @@
+<div class="utility-container">
+    <div class="utility-header">
+        <h3>Base64 Encoder/Decoder</h3>
+        <p>Convert text to Base64 encoding and vice versa</p>
+    </div>
+    
+    <div class="converter-layout">
+        <div class="input-section">
+            <label for="decoded-text">Decoded Text</label>
+            <textarea id="decoded-text" placeholder="Enter your text here..." rows="8"></textarea>
+            <div class="char-count">
+                <span id="decoded-count">0 characters</span>
+            </div>
+        </div>
+        
+        <div class="arrow-controls">
+            <button id="encode-btn" class="arrow-btn encode-arrow" title="Encode to Base64">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+                <span>Encode</span>
+            </button>
+            
+            <button id="decode-btn" class="arrow-btn decode-arrow" title="Decode from Base64">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                <span>Decode</span>
+            </button>
+        </div>
+        
+        <div class="input-section">
+            <label for="encoded-text">Base64 Encoded</label>
+            <textarea id="encoded-text" placeholder="Base64 encoded text will appear here..." rows="8"></textarea>
+            <div class="char-count">
+                <span id="encoded-count">0 characters</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="utility-actions">
+        <button id="clear-all" class="action-btn secondary">Clear All</button>
+        <button id="copy-decoded" class="action-btn">Copy Decoded</button>
+        <button id="copy-encoded" class="action-btn">Copy Encoded</button>
+    </div>
+    
+    <div class="utility-info">
+        <h4>About Base64 Encoding</h4>
+        <p>Base64 is a binary-to-text encoding scheme that represents binary data in an ASCII string format. It's commonly used for encoding data in email, URLs, and web applications.</p>
+    </div>
+</div>

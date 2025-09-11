@@ -16,12 +16,27 @@
             <div class="nav-brand">
                 <h1>Zig's Utilities</h1>
             </div>
-            <ul class="nav-tabs">
-                <li><a href="#home" class="nav-link active" data-tab="home">Home</a></li>
-                <li><a href="#utilities" class="nav-link" data-tab="utilities">Utilities</a></li>
-                <li><a href="#hex-editor" class="nav-link" data-tab="hex-editor">Hex Editor</a></li>
-                <li><a href="#settings" class="nav-link" data-tab="settings">Settings</a></li>
-            </ul>
+            <div class="nav-right">
+                <ul class="nav-tabs">
+                    <li><a href="#home" class="nav-link active" data-tab="home">Home</a></li>
+                    <li class="nav-dropdown">
+                        <a href="#utilities" class="nav-link" data-tab="utilities">Utilities</a>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item" data-utility="base64-encoder">Base64 Encoder/Decoder</a>
+                            <a href="#" class="dropdown-item" data-utility="image-converter">Image Format Converter</a>
+                        </div>
+                    </li>
+                    <li><a href="#hex-editor" class="nav-link" data-tab="hex-editor">Hex Editor</a></li>
+                </ul>
+                <div class="theme-toggle">
+                    <span class="theme-label">DARK</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="theme-toggle-checkbox">
+                        <span class="slider"></span>
+                    </label>
+                    <span class="theme-label">LIGHT</span>
+                </div>
+            </div>
         </nav>
     </header>
 
@@ -40,10 +55,6 @@
                         <h3>⬡ Hex Editor</h3>
                         <p>Create and edit hexagonal grid boards with customizable colors</p>
                     </div>
-                    <div class="feature-card" data-nav-tab="settings">
-                        <h3>⚙️ Settings</h3>
-                        <p>Customize your experience and preferences</p>
-                    </div>
                 </div>
             </div>
         </div>
@@ -51,11 +62,25 @@
         <!-- Utilities Tab Content -->
         <div id="utilities" class="tab-content">
             <h2>Utilities</h2>
-            <p>This section will contain various utility applications.</p>
+            <p>A collection of useful tools and converters for everyday tasks.</p>
             <div class="utility-grid">
-                <div class="utility-card">
-                    <h3>Coming Soon</h3>
-                    <p>Utility applications will be added here</p>
+                <div class="utility-card" data-utility="base64-encoder">
+                    <h3>🔐 Base64 Encoder/Decoder</h3>
+                    <p>Convert text to Base64 encoding and vice versa with bidirectional conversion arrows</p>
+                    <div class="utility-features">
+                        <span>• Real-time conversion</span>
+                        <span>• Character counting</span>
+                        <span>• Copy to clipboard</span>
+                    </div>
+                </div>
+                <div class="utility-card" data-utility="image-converter">
+                    <h3>🖼️ Image Format Converter</h3>
+                    <p>Convert images between WebP, JPG, and PNG formats with quality control</p>
+                    <div class="utility-features">
+                        <span>• Drag & drop support</span>
+                        <span>• Quality adjustment</span>
+                        <span>• Size comparison</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -67,22 +92,6 @@
             <div id="hex-editor-content"></div>
         </div>
 
-        <!-- Settings Tab Content -->
-        <div id="settings" class="tab-content">
-            <h2>Settings</h2>
-            <p>Customize your preferences.</p>
-            <div class="settings-section">
-                <div class="setting-group">
-                    <h3>Theme</h3>
-                    <label>
-                        <input type="radio" name="theme" value="light" checked> Light
-                    </label>
-                    <label>
-                        <input type="radio" name="theme" value="dark"> Dark
-                    </label>
-                </div>
-            </div>
-        </div>
     </main>
 
 

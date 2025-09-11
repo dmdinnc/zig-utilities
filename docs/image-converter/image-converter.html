@@ -1,0 +1,107 @@
+<div class="utility-container">
+    <div class="utility-header">
+        <h3>Image Format Converter</h3>
+        <p>Convert images between WebP, JPG, and PNG formats</p>
+    </div>
+    
+    <div class="converter-section">
+        <div class="upload-area" id="upload-area">
+            <div class="upload-content">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7,10 12,15 17,10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                <h4>Drop your image here</h4>
+                <p>or <span class="browse-link">browse files</span></p>
+                <small>Supports: JPG, PNG, WebP (max 10MB)</small>
+            </div>
+            <input type="file" id="file-input" accept="image/*" hidden>
+        </div>
+        
+        <div class="image-preview" id="image-preview" style="display: none;">
+            <div class="preview-header">
+                <h4>Original Image</h4>
+                <button id="remove-image" class="remove-btn" title="Remove image">×</button>
+            </div>
+            <img id="preview-img" alt="Preview">
+            <div class="image-info">
+                <span id="image-name"></span>
+                <span id="image-size"></span>
+                <span id="image-dimensions"></span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="conversion-controls" id="conversion-controls" style="display: none;">
+        <div class="format-selection">
+            <h4>Convert to:</h4>
+            <div class="format-buttons">
+                <button class="format-btn" data-format="webp">
+                    <span class="format-icon">🖼️</span>
+                    <span>WebP</span>
+                    <small>Smaller size</small>
+                </button>
+                <button class="format-btn" data-format="jpeg">
+                    <span class="format-icon">📷</span>
+                    <span>JPG</span>
+                    <small>Universal</small>
+                </button>
+                <button class="format-btn" data-format="png">
+                    <span class="format-icon">🎨</span>
+                    <span>PNG</span>
+                    <small>Transparency</small>
+                </button>
+            </div>
+        </div>
+        
+        <div class="quality-control" id="quality-control" style="display: none;">
+            <h4>Quality Settings</h4>
+            <div class="quality-slider">
+                <label for="quality-range">Quality: <span id="quality-value">90</span>%</label>
+                <input type="range" id="quality-range" min="10" max="100" value="90" step="5">
+            </div>
+        </div>
+    </div>
+    
+    <div class="conversion-result" id="conversion-result" style="display: none;">
+        <div class="result-header">
+            <h4>Converted Image</h4>
+            <div class="size-comparison">
+                <span id="original-size-display"></span>
+                <span class="arrow">→</span>
+                <span id="converted-size-display"></span>
+                <span id="size-reduction" class="size-reduction"></span>
+            </div>
+        </div>
+        <div class="result-preview">
+            <img id="result-img" alt="Converted image">
+        </div>
+        <div class="result-actions">
+            <button id="download-btn" class="action-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7,10 12,15 17,10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Download
+            </button>
+            <button id="convert-another" class="action-btn secondary">Convert Another</button>
+        </div>
+    </div>
+    
+    <div class="utility-info">
+        <h4>Supported Formats</h4>
+        <div class="format-info">
+            <div class="format-detail">
+                <strong>WebP:</strong> Modern format with excellent compression and quality. Smaller file sizes than JPG/PNG.
+            </div>
+            <div class="format-detail">
+                <strong>JPG:</strong> Universal format, best for photos. Lossy compression, no transparency support.
+            </div>
+            <div class="format-detail">
+                <strong>PNG:</strong> Lossless format with transparency support. Larger file sizes but perfect quality.
+            </div>
+        </div>
+    </div>
+</div>

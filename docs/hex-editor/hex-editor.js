@@ -323,7 +323,7 @@ function initializeHexEditor() {
             
             // Add circle function
             function addCircle(coord, pixel) {
-                const circleId = `circle-${coordKey.replace(/,/g, '_').replace(/-/g, 'n')}`;
+                const circleId = `circle-${coord.replace(/,/g, '_').replace(/-/g, 'n')}`;
                 const existingCircle = hexBoard.querySelector(`#${circleId}`);
                 
                 if (existingCircle) {

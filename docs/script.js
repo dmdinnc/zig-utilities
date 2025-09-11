@@ -1,29 +1,32 @@
+// Function to switch tabs (global scope)
+function switchTab(targetTab) {
+    const navLinks = document.querySelectorAll('.nav-link');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    // Remove active class from all nav links and tab contents
+    navLinks.forEach(link => link.classList.remove('active'));
+    tabContents.forEach(content => content.classList.remove('active'));
+
+    // Add active class to clicked nav link
+    const activeLink = document.querySelector(`[data-tab="${targetTab}"]`);
+    if (activeLink) {
+        activeLink.classList.add('active');
+    }
+
+    // Show the corresponding tab content
+    const activeContent = document.getElementById(targetTab);
+    if (activeContent) {
+        activeContent.classList.add('active');
+    }
+
+    // Update URL hash without scrolling
+    history.replaceState(null, null, `#${targetTab}`);
+}
+
 // Tab switching functionality
 document.addEventListener('DOMContentLoaded', function() {
     const navLinks = document.querySelectorAll('.nav-link');
     const tabContents = document.querySelectorAll('.tab-content');
-
-    // Function to switch tabs
-    function switchTab(targetTab) {
-        // Remove active class from all nav links and tab contents
-        navLinks.forEach(link => link.classList.remove('active'));
-        tabContents.forEach(content => content.classList.remove('active'));
-
-        // Add active class to clicked nav link
-        const activeLink = document.querySelector(`[data-tab="${targetTab}"]`);
-        if (activeLink) {
-            activeLink.classList.add('active');
-        }
-
-        // Show the corresponding tab content
-        const activeContent = document.getElementById(targetTab);
-        if (activeContent) {
-            activeContent.classList.add('active');
-        }
-
-        // Update URL hash without scrolling
-        history.replaceState(null, null, `#${targetTab}`);
-    }
 
     // Add click event listeners to navigation links
     navLinks.forEach(link => {
@@ -47,6 +50,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const hash = window.location.hash.substring(1);
         if (hash && document.getElementById(hash)) {
             switchTab(hash);
+        } else if (hash && hash.startsWith('utility-')) {
+            // Handle utility URLs - extract utility name and load it
+            const utilityName = hash.replace('utility-', '');
+            loadUtility(utilityName);
         } else {
             switchTab('home');
         }
@@ -56,40 +63,43 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeTab();
 
     // Theme switching functionality
-    const themeRadios = document.querySelectorAll('input[name="theme"]');
+    const themeToggle = document.getElementById('theme-toggle-checkbox');
     
     function applyTheme(theme) {
         document.body.setAttribute('data-theme', theme);
         localStorage.setItem('preferred-theme', theme);
+        
+        // Update toggle state
+        if (themeToggle) {
+            themeToggle.checked = theme === 'light';
+        }
     }
 
     // Load saved theme preference
     const savedTheme = localStorage.getItem('preferred-theme') || 'light';
-    const savedThemeRadio = document.querySelector(`input[name="theme"][value="${savedTheme}"]`);
-    if (savedThemeRadio) {
-        savedThemeRadio.checked = true;
-        applyTheme(savedTheme);
-    }
+    applyTheme(savedTheme);
 
-    // Add theme change listeners
-    themeRadios.forEach(radio => {
-        radio.addEventListener('change', function() {
-            if (this.checked) {
-                applyTheme(this.value);
-            }
+    // Add theme toggle listener
+    if (themeToggle) {
+        themeToggle.addEventListener('change', function() {
+            const newTheme = this.checked ? 'light' : 'dark';
+            applyTheme(newTheme);
         });
-    });
+    }
 
 
     // Add smooth scrolling for better UX
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
+            const href = this.getAttribute('href');
+            if (href && href !== '#') {
+                const target = document.querySelector(href);
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
             }
         });
     });
@@ -97,10 +107,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add keyboard navigation support
     document.addEventListener('keydown', function(e) {
         // Alt + number keys to switch tabs
-        if (e.altKey && e.key >= '1' && e.key <= '4') {
+        if (e.altKey && e.key >= '1' && e.key <= '3') {
             e.preventDefault();
             const tabIndex = parseInt(e.key) - 1;
-            const tabs = ['home', 'utilities', 'hex-editor', 'settings'];
+            const tabs = ['home', 'utilities', 'hex-editor'];
             if (tabs[tabIndex]) {
                 switchTab(tabs[tabIndex]);
             }
@@ -135,13 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const currentTheme = document.body.getAttribute('data-theme') || 'light';
             const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            
-            // Update radio button
-            const themeRadio = document.querySelector(`input[name="theme"][value="${newTheme}"]`);
-            if (themeRadio) {
-                themeRadio.checked = true;
-                applyTheme(newTheme);
-            }
+            applyTheme(newTheme);
         }
     });
 
@@ -169,6 +173,25 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Utility card navigation
+    const utilityCards = document.querySelectorAll('.utility-card[data-utility]');
+    utilityCards.forEach(card => {
+        card.addEventListener('click', function() {
+            const utilityName = this.dataset.utility;
+            loadUtility(utilityName);
+        });
+    });
+
+    // Dropdown menu navigation
+    const dropdownItems = document.querySelectorAll('.dropdown-item[data-utility]');
+    dropdownItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            const utilityName = this.dataset.utility;
+            loadUtility(utilityName);
+        });
+    });
+
     // Check if hex editor tab is active on page load and load content if needed
     setTimeout(() => {
         const activeTab = document.querySelector('.nav-link.active');
@@ -182,9 +205,85 @@ document.addEventListener('DOMContentLoaded', function() {
 
     console.log('Core Website Framework initialized successfully!');
     console.log('Keyboard shortcuts:');
-    console.log('- Alt + 1-4: Switch tabs');
+    console.log('- Alt + 1-3: Switch tabs');
     console.log('- Ctrl + T: Toggle theme');
 });
+
+// Load utility content and initialize
+async function loadUtility(utilityName) {
+    console.log(`Loading ${utilityName} utility...`);
+    
+    // Create a new tab content div for the utility
+    const existingUtilityTab = document.getElementById(`utility-${utilityName}`);
+    if (existingUtilityTab) {
+        // If utility is already loaded, just switch to it
+        switchTab(`utility-${utilityName}`);
+        return;
+    }
+
+    try {
+        // Load HTML, CSS, and JS files
+        const [htmlResponse, cssResponse, jsResponse] = await Promise.all([
+            fetch(`${utilityName}/${utilityName}.html`),
+            fetch(`${utilityName}/${utilityName}.css`),
+            fetch(`${utilityName}/${utilityName}.js`)
+        ]);
+
+        if (!htmlResponse.ok || !cssResponse.ok || !jsResponse.ok) {
+            throw new Error('Failed to load utility files');
+        }
+
+        const [htmlContent, cssContent, jsContent] = await Promise.all([
+            htmlResponse.text(),
+            cssResponse.text(),
+            jsResponse.text()
+        ]);
+
+        // Create and inject CSS
+        const styleElement = document.createElement('style');
+        styleElement.id = `${utilityName}-styles`;
+        styleElement.textContent = cssContent;
+        document.head.appendChild(styleElement);
+
+        // Create new tab content
+        const tabContent = document.createElement('div');
+        tabContent.id = `utility-${utilityName}`;
+        tabContent.className = 'tab-content';
+        tabContent.innerHTML = htmlContent;
+        
+        // Insert after utilities tab
+        const utilitiesTab = document.getElementById('utilities');
+        utilitiesTab.parentNode.insertBefore(tabContent, utilitiesTab.nextSibling);
+
+        // Load and execute JavaScript
+        const scriptElement = document.createElement('script');
+        scriptElement.textContent = jsContent;
+        document.body.appendChild(scriptElement);
+
+        // Switch to the new utility tab
+        switchTab(`utility-${utilityName}`);
+        
+        // Update URL hash to reflect the utility
+        history.replaceState(null, null, `#utility-${utilityName}`);
+
+        // Initialize the utility
+        setTimeout(() => {
+            const initFunctionName = `initialize${utilityName.split('-').map(word => 
+                word.charAt(0).toUpperCase() + word.slice(1)).join('')}`;
+            
+            if (typeof window[initFunctionName] === 'function') {
+                window[initFunctionName]();
+                console.log(`${utilityName} utility initialized successfully!`);
+            } else {
+                console.warn(`Initialization function ${initFunctionName} not found`);
+            }
+        }, 100);
+
+    } catch (error) {
+        console.error(`Failed to load ${utilityName} utility:`, error);
+        alert(`Failed to load ${utilityName} utility. Please try again.`);
+    }
+}
 
 // Load hex editor content and initialize
 async function loadHexEditor() {
