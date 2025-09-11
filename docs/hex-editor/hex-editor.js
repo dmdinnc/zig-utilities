@@ -260,7 +260,7 @@ function initializeHexEditor() {
     function generateHexBoard() {
         const coords = generateHexCoordinates(hexRadius);
         const hexSize = 20;
-        const padding = 12; // 12px padding from edges
+        const padding = 6;
         
         // Calculate actual bounds of the hex grid
         let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;

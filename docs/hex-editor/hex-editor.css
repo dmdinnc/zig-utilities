@@ -84,6 +84,11 @@
     margin-top: 0.5rem;
 }
 
+.color-palette.compact {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.25rem;
+}
+
 .color-option {
     width: 40px;
     height: 40px;
@@ -91,6 +96,12 @@
     cursor: pointer;
     border: 2px solid var(--border-color);
     transition: all 0.2s ease;
+}
+
+.color-palette.compact .color-option {
+    width: 28px;
+    height: 28px;
+    border-width: 1px;
 }
 
 .color-option:hover {
