@@ -29,6 +29,7 @@ function initializeHexEditor() {
     const borderHexInput = document.getElementById('border-hex-input');
     const clearButton = document.getElementById('clear-board');
     const exportButton = document.getElementById('export-board');
+    const exportFilenameInput = document.getElementById('export-filename');
     const hexBoard = document.getElementById('hex-board');
     
     // Control tab elements
@@ -509,6 +510,59 @@ function initializeHexEditor() {
         hexBoard.appendChild(lineElement);
     }
 
+    function removeLine(lineId) {
+        // Remove from DOM
+        const lineElement = hexBoard.querySelector(`#${lineId}`);
+        if (lineElement) {
+            lineElement.remove();
+        }
+        
+        // Remove from lineData storage
+        lineData.delete(lineId);
+        
+        // Also check for reverse direction line ID and remove if exists
+        const lineInfo = Array.from(lineData.entries()).find(([id, info]) => {
+            const reverseId = sanitizeLineId(info.endCoord, info.startCoord);
+            return reverseId === lineId;
+        });
+        
+        if (lineInfo) {
+            lineData.delete(lineInfo[0]);
+        }
+        
+        console.log('Line removed:', lineId);
+    }
+
+    function highlightLine(lineGroup, isHighlighted) {
+        // Find all visual elements (lines and arrows) in the group, excluding hit areas
+        const visualElements = lineGroup.querySelectorAll('line[stroke]:not([stroke="transparent"]), polygon');
+        
+        visualElements.forEach(element => {
+            if (isHighlighted) {
+                // Store original stroke for restoration
+                if (!element.dataset.originalStroke) {
+                    element.dataset.originalStroke = element.getAttribute('stroke');
+                    element.dataset.originalStrokeWidth = element.getAttribute('stroke-width') || '';
+                }
+                
+                // Apply highlight effect
+                element.setAttribute('stroke', '#ff6b6b'); // Bright red highlight
+                const currentWidth = parseInt(element.getAttribute('stroke-width') || '2');
+                element.setAttribute('stroke-width', Math.max(currentWidth + 1, 3)); // Slightly thicker
+                element.style.filter = 'drop-shadow(0 0 3px rgba(255, 107, 107, 0.6))'; // Glow effect
+            } else {
+                // Restore original appearance
+                if (element.dataset.originalStroke) {
+                    element.setAttribute('stroke', element.dataset.originalStroke);
+                    if (element.dataset.originalStrokeWidth) {
+                        element.setAttribute('stroke-width', element.dataset.originalStrokeWidth);
+                    }
+                    element.style.filter = '';
+                }
+            }
+        });
+    }
+
     function createLineElement(startPixel, endPixel, color, width, type, isPreview) {
         const boardSize = (hexRadius * 2 + 1) * 20 * 2;
         const centerX = boardSize / 2;
@@ -520,9 +574,44 @@ function initializeHexEditor() {
         const y2 = centerY + endPixel.y;
         
         const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        group.style.pointerEvents = 'none';
+        // Enable pointer events for lines (but not for preview lines)
+        if (isPreview) {
+            group.style.pointerEvents = 'none';
+        } else {
+            group.style.pointerEvents = 'stroke';
+            group.style.cursor = 'pointer';
+            
+            // Add right-click handler to remove the line
+            group.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                removeLine(group.id);
+            });
+            
+            // Add hover highlighting
+            group.addEventListener('mouseenter', function(e) {
+                highlightLine(group, true);
+            });
+            
+            group.addEventListener('mouseleave', function(e) {
+                highlightLine(group, false);
+            });
+        }
         
         if (type === 'solid' || type === 'dotted') {
+            // Create invisible hit area for easier clicking
+            if (!isPreview) {
+                const hitArea = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                hitArea.setAttribute('x1', x1);
+                hitArea.setAttribute('y1', y1);
+                hitArea.setAttribute('x2', x2);
+                hitArea.setAttribute('y2', y2);
+                hitArea.setAttribute('stroke', 'transparent');
+                hitArea.setAttribute('stroke-width', Math.max(width + 4, 8)); // Add 4px grace area, minimum 8px
+                hitArea.style.pointerEvents = 'stroke';
+                group.appendChild(hitArea);
+            }
+            
             const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             line.setAttribute('x1', x1);
             line.setAttribute('y1', y1);
@@ -530,6 +619,7 @@ function initializeHexEditor() {
             line.setAttribute('y2', y2);
             line.setAttribute('stroke', color);
             line.setAttribute('stroke-width', width);
+            line.style.pointerEvents = 'none'; // Visual line doesn't handle events
             if (type === 'dotted') {
                 line.setAttribute('stroke-dasharray', `${width * 2},${width * 2}`);
             }
@@ -543,11 +633,25 @@ function initializeHexEditor() {
             const unitY = dy / length;
             const arrowSize = width * 3;
             
+            // Create invisible hit area for easier clicking (full line length)
+            if (!isPreview) {
+                const hitArea = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                hitArea.setAttribute('x1', x1);
+                hitArea.setAttribute('y1', y1);
+                hitArea.setAttribute('x2', x2);
+                hitArea.setAttribute('y2', y2);
+                hitArea.setAttribute('stroke', 'transparent');
+                hitArea.setAttribute('stroke-width', Math.max(width + 4, 8)); // Add 4px grace area, minimum 8px
+                hitArea.style.pointerEvents = 'stroke';
+                group.appendChild(hitArea);
+            }
+            
             if (type === 'arrow-two') {
                 // Start arrow (pointing backwards)
                 const startArrowX = x1 + unitX * arrowSize;
                 const startArrowY = y1 + unitY * arrowSize;
                 const startArrow = createArrowHead(startArrowX, startArrowY, x1, y1, arrowSize, color, false);
+                startArrow.style.pointerEvents = 'none'; // Arrow heads don't handle events
                 group.appendChild(startArrow);
             }
             
@@ -564,10 +668,12 @@ function initializeHexEditor() {
             line.setAttribute('y2', lineEndY);
             line.setAttribute('stroke', color);
             line.setAttribute('stroke-width', width);
+            line.style.pointerEvents = 'none'; // Visual line doesn't handle events
             group.appendChild(line);
             
             // End arrow
             const endArrow = createArrowHead(lineEndX, lineEndY, x2, y2, arrowSize, color, false);
+            endArrow.style.pointerEvents = 'none'; // Arrow heads don't handle events
             group.appendChild(endArrow);
         }
         
@@ -604,12 +710,41 @@ function initializeHexEditor() {
         return arrow;
     }
 
+    // Function to increment filename number
+    function incrementFilename(filename) {
+        // Match numbers at the end of the filename (before extension if any)
+        const match = filename.match(/^(.*?)(\d+)(\.[^.]*)?$/);
+        
+        if (match) {
+            const prefix = match[1];
+            const number = parseInt(match[2]);
+            const extension = match[3] || '';
+            return `${prefix}${number + 1}${extension}`;
+        } else {
+            // If no number found, append -1
+            const dotIndex = filename.lastIndexOf('.');
+            if (dotIndex > 0) {
+                return filename.substring(0, dotIndex) + '-1' + filename.substring(dotIndex);
+            } else {
+                return filename + '-1';
+            }
+        }
+    }
+
     // Export hex board as PNG
     function exportHexBoard() {
         const svgData = new XMLSerializer().serializeToString(hexBoard);
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         const img = new Image();
+        
+        // Get current filename from input
+        let currentFilename = exportFilenameInput.value.trim() || 'hex-board-1';
+        
+        // Ensure .png extension
+        if (!currentFilename.toLowerCase().endsWith('.png')) {
+            currentFilename += '.png';
+        }
         
         // High-quality export settings
         const scaleFactor = 4; // 4x resolution for crisp output
@@ -656,10 +791,14 @@ function initializeHexEditor() {
             // Export as high-quality PNG
             canvas.toBlob(function(blob) {
                 const link = document.createElement('a');
-                link.download = `hex-board-${hexRadius}-radius-hq.png`;
+                link.download = currentFilename;
                 link.href = URL.createObjectURL(blob);
                 link.click();
                 URL.revokeObjectURL(link.href);
+                
+                // Increment filename for next export
+                const nextFilename = incrementFilename(currentFilename.replace('.png', ''));
+                exportFilenameInput.value = nextFilename;
             }, 'image/png', 1.0); // Maximum quality
             
             URL.revokeObjectURL(url);
