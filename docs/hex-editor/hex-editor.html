@@ -20,6 +20,7 @@
                     <div class="control-tabs">
                         <button class="control-tab active" data-control-tab="colors">Colors</button>
                         <button class="control-tab" data-control-tab="lines">Lines</button>
+                        <button class="control-tab" data-control-tab="background">Background</button>
                     </div>
                     
                     <!-- Colors Tab Content -->
@@ -44,15 +45,11 @@
                         <div class="control-group">
                             <label>Author's Palette:</label>
                             <div class="color-palette compact">
-                                <div class="color-option" data-color="#8B4513" style="background-color: #8B4513;" title="Saddle Brown"></div>
-                                <div class="color-option" data-color="#556B2F" style="background-color: #556B2F;" title="Dark Olive Green"></div>
-                                <div class="color-option" data-color="#2F4F4F" style="background-color: #2F4F4F;" title="Dark Slate Gray"></div>
-                                <div class="color-option" data-color="#483D8B" style="background-color: #483D8B;" title="Dark Slate Blue"></div>
-                                <div class="color-option" data-color="#8B0000" style="background-color: #8B0000;" title="Dark Red"></div>
-                                <div class="color-option" data-color="#B8860B" style="background-color: #B8860B;" title="Dark Goldenrod"></div>
-                                <div class="color-option" data-color="#708090" style="background-color: #708090;" title="Slate Gray"></div>
-                                <div class="color-option" data-color="#CD853F" style="background-color: #CD853F;" title="Peru"></div>
-                                <div class="color-option" data-color="#4682B4" style="background-color: #4682B4;" title="Steel Blue"></div>
+                                <div class="color-option" data-color="#787878" style="background-color: #787878;" title="Grey"></div>
+                                <div class="color-option" data-color="#ffff70" style="background-color: #ffff70;" title="Yellow"></div>
+                                <div class="color-option" data-color="#ff3333" style="background-color: #ff3333;" title="Red"></div>
+                                <div class="color-option" data-color="#009900" style="background-color: #009900;" title="Green"></div>
+                                <div class="color-option" data-color="#70bfff" style="background-color: #70bfff;" title="Blue"></div>
                             </div>
                         </div>
                         
@@ -66,16 +63,6 @@
                             <label for="border-color">Hex Border Color:</label>
                             <input type="color" id="border-color" value="#000000">
                             <input type="text" id="border-hex-input" placeholder="#000000" maxlength="7">
-                        </div>
-                        
-                        <div class="control-group">
-                            <label for="background-color">Background Color:</label>
-                            <input type="color" id="background-color" value="#ffffff">
-                            <input type="text" id="background-hex-input" placeholder="#ffffff" maxlength="7">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="transparent-background">
-                                Transparent Background
-                            </label>
                         </div>
                     </div>
                     
@@ -120,6 +107,47 @@
                             <label for="line-width">Line Width:</label>
                             <input type="range" id="line-width" min="1" max="5" value="2">
                             <span id="line-width-value">2</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Background Tab Content -->
+                    <div id="background-controls" class="control-tab-content">
+                        <div class="control-group">
+                            <label>Background Type:</label>
+                            <div class="background-type-options">
+                                <label class="radio-label">
+                                    <input type="radio" name="background-type" value="solid">
+                                    <span>Solid Color</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="background-type" value="none">
+                                    <span>No Background</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="background-type" value="hexagon" checked>
+                                    <span>Rounded Hexagon</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="control-group" id="solid-bg-controls" style="display: none;">
+                            <label for="background-color">Background Color:</label>
+                            <input type="color" id="background-color" value="#ffffff">
+                            <input type="text" id="background-hex-input" placeholder="#ffffff" maxlength="7">
+                        </div>
+                        
+                        <div class="control-group" id="hexagon-bg-controls">
+                            <label for="hexagon-bg-color">Hexagon Background Color:</label>
+                            <input type="color" id="hexagon-bg-color" value="#000000">
+                            <input type="text" id="hexagon-bg-hex-input" placeholder="#000000" maxlength="7">
+                            
+                            <label for="hexagon-stroke-color">Hexagon Stroke Color:</label>
+                            <input type="color" id="hexagon-stroke-color" value="#000000">
+                            <input type="text" id="hexagon-stroke-hex-input" placeholder="#000000" maxlength="7">
+                            
+                            <label for="hexagon-stroke-width">Hexagon Stroke Width:</label>
+                            <input type="range" id="hexagon-stroke-width" min="1" max="8" value="1">
+                            <span id="hexagon-stroke-width-value">1</span>
                         </div>
                     </div>
                     

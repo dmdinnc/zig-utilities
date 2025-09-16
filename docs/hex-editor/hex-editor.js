@@ -2,13 +2,16 @@
 function initializeHexEditor() {
     let currentColor = '#ffffff';
     let backgroundColor = '#ffffff';
+    let backgroundType = 'hexagon'; // 'solid', 'none', 'hexagon'
+    let hexagonBgColor = '#000000';
+    let hexagonStrokeColor = '#000000';
+    let hexagonStrokeWidth = 1;
     let hexRadius = 3;
     let hexData = new Map(); // Store hex colors by coordinates
     let hexCircleData = new Map(); // Store circle colors by coordinates
     let lineData = new Map(); // Store lines by ID
     let isDragging = false;
     let dragStarted = false;
-    let isBackgroundTransparent = false;
     let currentMode = 'colors'; // 'colors' or 'lines'
     let currentLineType = 'solid';
     let currentLineColor = '#000000';
@@ -24,7 +27,15 @@ function initializeHexEditor() {
     const hexInput = document.getElementById('hex-input');
     const backgroundColorPicker = document.getElementById('background-color');
     const backgroundHexInput = document.getElementById('background-hex-input');
-    const transparentBackgroundCheckbox = document.getElementById('transparent-background');
+    const backgroundTypeRadios = document.querySelectorAll('input[name="background-type"]');
+    const solidBgControls = document.getElementById('solid-bg-controls');
+    const hexagonBgControls = document.getElementById('hexagon-bg-controls');
+    const hexagonBgColorPicker = document.getElementById('hexagon-bg-color');
+    const hexagonBgHexInput = document.getElementById('hexagon-bg-hex-input');
+    const hexagonStrokeColorPicker = document.getElementById('hexagon-stroke-color');
+    const hexagonStrokeHexInput = document.getElementById('hexagon-stroke-hex-input');
+    const hexagonStrokeWidthSlider = document.getElementById('hexagon-stroke-width');
+    const hexagonStrokeWidthValue = document.getElementById('hexagon-stroke-width-value');
     const borderColorPicker = document.getElementById('border-color');
     const borderHexInput = document.getElementById('border-hex-input');
     const clearButton = document.getElementById('clear-board');
@@ -87,6 +98,17 @@ function initializeHexEditor() {
         }
     });
 
+    // Background type radio buttons
+    backgroundTypeRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.checked) {
+                backgroundType = this.value;
+                updateBackgroundControls();
+                updateBackgroundColor();
+            }
+        });
+    });
+
     // Background color picker
     backgroundColorPicker.addEventListener('input', function() {
         backgroundColor = this.value;
@@ -104,11 +126,40 @@ function initializeHexEditor() {
         }
     });
 
-    // Transparent background checkbox
-    transparentBackgroundCheckbox.addEventListener('change', function() {
-        isBackgroundTransparent = this.checked;
-        backgroundColorPicker.disabled = this.checked;
-        backgroundHexInput.disabled = this.checked;
+    // Hexagon background controls
+    hexagonBgColorPicker.addEventListener('input', function() {
+        hexagonBgColor = this.value;
+        hexagonBgHexInput.value = this.value;
+        updateBackgroundColor();
+    });
+
+    hexagonBgHexInput.addEventListener('input', function() {
+        const value = this.value;
+        if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
+            hexagonBgColor = value;
+            hexagonBgColorPicker.value = value;
+            updateBackgroundColor();
+        }
+    });
+
+    hexagonStrokeColorPicker.addEventListener('input', function() {
+        hexagonStrokeColor = this.value;
+        hexagonStrokeHexInput.value = this.value;
+        updateBackgroundColor();
+    });
+
+    hexagonStrokeHexInput.addEventListener('input', function() {
+        const value = this.value;
+        if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
+            hexagonStrokeColor = value;
+            hexagonStrokeColorPicker.value = value;
+            updateBackgroundColor();
+        }
+    });
+
+    hexagonStrokeWidthSlider.addEventListener('input', function() {
+        hexagonStrokeWidth = parseInt(this.value);
+        hexagonStrokeWidthValue.textContent = hexagonStrokeWidth;
         updateBackgroundColor();
     });
 
@@ -238,13 +289,177 @@ function initializeHexEditor() {
         return `M ${points.join(' L ')} Z`;
     }
 
-    // Update background color
-    function updateBackgroundColor() {
-        if (isBackgroundTransparent) {
-            hexBoard.style.backgroundColor = 'transparent';
-        } else {
-            hexBoard.style.backgroundColor = backgroundColor;
+    // Update background controls visibility
+    function updateBackgroundControls() {
+        if (backgroundType === 'solid') {
+            solidBgControls.style.display = 'block';
+            hexagonBgControls.style.display = 'none';
+        } else if (backgroundType === 'hexagon') {
+            solidBgControls.style.display = 'none';
+            hexagonBgControls.style.display = 'block';
+        } else { // none
+            solidBgControls.style.display = 'none';
+            hexagonBgControls.style.display = 'none';
         }
+    }
+
+    // Update background color and rendering
+    function updateBackgroundColor() {
+        if (backgroundType === 'none') {
+            hexBoard.style.backgroundColor = 'transparent';
+        } else if (backgroundType === 'solid') {
+            hexBoard.style.backgroundColor = backgroundColor;
+        } else if (backgroundType === 'hexagon') {
+            hexBoard.style.backgroundColor = 'transparent';
+            renderHexagonBackground();
+        }
+    }
+
+    // Render hexagon background
+    function renderHexagonBackground() {
+        // Remove existing background elements
+        const existingBg = hexBoard.querySelector('#background-hexagon');
+        const existingStroke = hexBoard.querySelector('#background-hexagon-stroke');
+        if (existingBg) {
+            existingBg.remove();
+        }
+        if (existingStroke) {
+            existingStroke.remove();
+        }
+
+        if (backgroundType !== 'hexagon') return;
+
+        // Calculate the outer hexagon bounds with 2px gap
+        const coords = generateHexCoordinates(hexRadius);
+        const hexSize = 20;
+        
+        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+        coords.forEach(coord => {
+            const pixel = hexToPixel(coord.q, coord.r, hexSize);
+            const hexWidth = hexSize * Math.sqrt(3);
+            const hexHeight = hexSize * 2;
+            minX = Math.min(minX, pixel.x - hexWidth/2);
+            maxX = Math.max(maxX, pixel.x + hexWidth/2);
+            minY = Math.min(minY, pixel.y - hexHeight/2);
+            maxY = Math.max(maxY, pixel.y + hexHeight/2);
+        });
+
+        // Add 4px gap around the hex grid to avoid overlaps
+        const gap = 4;
+        const centerX = (minX + maxX) / 2;
+        const centerY = (minY + maxY) / 2;
+        
+        // Calculate distance from center to furthest hex corner
+        let maxDistanceFromCenter = 0;
+        coords.forEach(coord => {
+            const pixel = hexToPixel(coord.q, coord.r, hexSize);
+            // Check all 6 corners of each hex
+            for (let i = 0; i < 6; i++) {
+                const angle = (Math.PI / 3) * i;
+                const cornerX = pixel.x + hexSize * Math.cos(angle);
+                const cornerY = pixel.y + hexSize * Math.sin(angle);
+                const distanceFromCenter = Math.sqrt(
+                    Math.pow(cornerX - centerX, 2) + Math.pow(cornerY - centerY, 2)
+                );
+                maxDistanceFromCenter = Math.max(maxDistanceFromCenter, distanceFromCenter);
+            }
+        });
+
+        // Add 2px beyond the furthest hex corner
+        const hexBgSize = maxDistanceFromCenter + gap;
+
+        // Create actual hexagon shape with rounded corners
+        const bgHexPath = generateRoundedHexPath(centerX, centerY, hexBgSize, 8); // 8px corner radius
+
+        // Create background fill (behind hexes)
+        const bgHex = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        bgHex.setAttribute('id', 'background-hexagon');
+        bgHex.setAttribute('d', bgHexPath);
+        bgHex.setAttribute('fill', hexagonBgColor);
+        bgHex.setAttribute('stroke', 'none');
+        bgHex.style.pointerEvents = 'none';
+
+        // Create stroke outline (on top of hexes)
+        const strokeHex = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        strokeHex.setAttribute('id', 'background-hexagon-stroke');
+        strokeHex.setAttribute('d', bgHexPath);
+        strokeHex.setAttribute('fill', 'none');
+        strokeHex.setAttribute('stroke', hexagonStrokeColor);
+        strokeHex.setAttribute('stroke-width', hexagonStrokeWidth);
+        strokeHex.style.pointerEvents = 'none';
+
+        // Insert background at the beginning (behind hexes)
+        hexBoard.insertBefore(bgHex, hexBoard.firstChild);
+        // Insert stroke at the end (on top of hexes)
+        hexBoard.appendChild(strokeHex);
+    }
+
+    // Generate rounded hexagon path
+    function generateRoundedHexPath(centerX, centerY, size, cornerRadius) {
+        const points = [];
+        for (let i = 0; i < 6; i++) {
+            const angle = (Math.PI / 3) * i; // No rotation - pointy-top to match hex grid
+            const x = centerX + size * Math.cos(angle);
+            const y = centerY + size * Math.sin(angle);
+            points.push({ x, y });
+        }
+
+        // Create path with rounded corners
+        let path = '';
+        for (let i = 0; i < points.length; i++) {
+            const current = points[i];
+            const next = points[(i + 1) % points.length];
+            const prev = points[(i - 1 + points.length) % points.length];
+
+            // Calculate direction vectors
+            const toPrev = { x: prev.x - current.x, y: prev.y - current.y };
+            const toNext = { x: next.x - current.x, y: next.y - current.y };
+            
+            // Normalize vectors
+            const lenPrev = Math.sqrt(toPrev.x * toPrev.x + toPrev.y * toPrev.y);
+            const lenNext = Math.sqrt(toNext.x * toNext.x + toNext.y * toNext.y);
+            toPrev.x /= lenPrev; toPrev.y /= lenPrev;
+            toNext.x /= lenNext; toNext.y /= lenNext;
+
+            // Calculate control points for rounded corner
+            const controlPrev = { 
+                x: current.x + toPrev.x * cornerRadius, 
+                y: current.y + toPrev.y * cornerRadius 
+            };
+            const controlNext = { 
+                x: current.x + toNext.x * cornerRadius, 
+                y: current.y + toNext.y * cornerRadius 
+            };
+
+            if (i === 0) {
+                path += `M ${controlNext.x} ${controlNext.y}`;
+            } else {
+                path += ` L ${controlPrev.x} ${controlPrev.y}`;
+                path += ` Q ${current.x} ${current.y} ${controlNext.x} ${controlNext.y}`;
+            }
+        }
+        
+        // Close the path with final curve
+        const firstPoint = points[0];
+        const lastPoint = points[points.length - 1];
+        const toFirst = { x: firstPoint.x - lastPoint.x, y: firstPoint.y - lastPoint.y };
+        const lenFirst = Math.sqrt(toFirst.x * toFirst.x + toFirst.y * toFirst.y);
+        toFirst.x /= lenFirst; toFirst.y /= lenFirst;
+        
+        const controlLast = { 
+            x: lastPoint.x + toFirst.x * cornerRadius, 
+            y: lastPoint.y + toFirst.y * cornerRadius 
+        };
+        const controlFirstStart = { 
+            x: firstPoint.x - toFirst.x * cornerRadius, 
+            y: firstPoint.y - toFirst.y * cornerRadius 
+        };
+        
+        path += ` L ${controlLast.x} ${controlLast.y}`;
+        path += ` Q ${lastPoint.x} ${lastPoint.y} ${controlFirstStart.x} ${controlFirstStart.y}`;
+        path += ' Z';
+
+        return path;
     }
 
     // Update hex border colors
@@ -288,11 +503,16 @@ function initializeHexEditor() {
 
         // Update SVG viewBox and background
         hexBoard.setAttribute('viewBox', `${-offsetX} ${-offsetY} ${viewBoxWidth} ${viewBoxHeight}`);
-        hexBoard.style.backgroundColor = backgroundColor;
+        updateBackgroundColor();
         
         
         // Clear existing hexagons
         hexBoard.innerHTML = '';
+
+        // Render background first if needed
+        if (backgroundType === 'hexagon') {
+            renderHexagonBackground();
+        }
 
         coords.forEach(coord => {
             const pixel = hexToPixel(coord.q, coord.r, hexSize);
@@ -766,17 +986,25 @@ function initializeHexEditor() {
             currentFilename += '.png';
         }
         
-        // High-quality export settings
-        const scaleFactor = 4; // 4x resolution for crisp output
+        // Optimized export settings for card game corner images
+        const scaleFactor = 0.8; // Further reduced for very small card corner images
         const svgRect = hexBoard.getBoundingClientRect();
-        const exportWidth = Math.max(800, svgRect.width * scaleFactor);
-        const exportHeight = Math.max(800, svgRect.height * scaleFactor);
+        const exportWidth = Math.min(200, svgRect.width * scaleFactor); // Much smaller for card corners
+        const exportHeight = Math.min(200, svgRect.height * scaleFactor);
         
         // Create high-resolution SVG with explicit dimensions
         const svgElement = hexBoard.cloneNode(true);
         svgElement.setAttribute('width', exportWidth);
         svgElement.setAttribute('height', exportHeight);
-        svgElement.style.backgroundColor = isBackgroundTransparent ? 'transparent' : backgroundColor;
+        
+        // Set background based on current background type
+        if (backgroundType === 'none') {
+            svgElement.style.backgroundColor = 'transparent';
+        } else if (backgroundType === 'solid') {
+            svgElement.style.backgroundColor = backgroundColor;
+        } else if (backgroundType === 'hexagon') {
+            svgElement.style.backgroundColor = 'transparent';
+        }
         
         // Ensure stroke properties are preserved with proper scaling
         const hexCells = svgElement.querySelectorAll('.hex-cell');
@@ -799,16 +1027,21 @@ function initializeHexEditor() {
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
             
-            // Fill background if not transparent
-            if (!isBackgroundTransparent) {
+            // Fill background based on background type
+            if (backgroundType === 'solid') {
                 ctx.fillStyle = backgroundColor;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
+            } else if (backgroundType === 'hexagon') {
+                // For hexagon background, fill with transparent first
+                // The hexagon background is already in the SVG
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
             }
+            // For 'none' type, leave transparent
             
             // Draw the SVG at high resolution
             ctx.drawImage(img, 0, 0, exportWidth, exportHeight);
             
-            // Export as high-quality PNG
+            // Export as compressed PNG
             canvas.toBlob(function(blob) {
                 const link = document.createElement('a');
                 link.download = currentFilename;
@@ -819,7 +1052,7 @@ function initializeHexEditor() {
                 // Increment filename for next export
                 const nextFilename = incrementFilename(currentFilename.replace('.png', ''));
                 exportFilenameInput.value = nextFilename;
-            }, 'image/png', 1.0); // Maximum quality
+            }, 'image/png', 0.6); // Further reduced quality for card game corner images
             
             URL.revokeObjectURL(url);
         };
@@ -831,6 +1064,7 @@ function initializeHexEditor() {
     generateHexBoard();
     
     // Initialize UI state to match defaults
+    updateBackgroundControls();
     updateBackgroundColor();
 }
 
