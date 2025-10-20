@@ -107,10 +107,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add keyboard navigation support
     document.addEventListener('keydown', function(e) {
         // Alt + number keys to switch tabs
-        if (e.altKey && e.key >= '1' && e.key <= '3') {
+        if (e.altKey && e.key >= '1' && e.key <= '4') {
             e.preventDefault();
             const tabIndex = parseInt(e.key) - 1;
-            const tabs = ['home', 'utilities', 'hex-editor'];
+            const tabs = ['home', 'utilities', 'hex-board-editor', 'hex-designer'];
             if (tabs[tabIndex]) {
                 switchTab(tabs[tabIndex]);
             }
@@ -149,13 +149,25 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Load hex editor when hex-editor tab is accessed
-    const hexEditorTab = document.querySelector('[data-tab="hex-editor"]');
-    if (hexEditorTab) {
-        hexEditorTab.addEventListener('click', function() {
+    // Load hex board editor when hex-board-editor tab is accessed
+    const hexBoardEditorTab = document.querySelector('[data-tab="hex-board-editor"]');
+    if (hexBoardEditorTab) {
+        hexBoardEditorTab.addEventListener('click', function() {
             setTimeout(() => {
-                if (!document.getElementById('hex-editor-content').innerHTML.trim()) {
-                    loadHexEditor();
+                if (!document.getElementById('hex-board-editor-content').innerHTML.trim()) {
+                    loadHexBoardEditor();
+                }
+            }, 100);
+        });
+    }
+
+    // Load hex designer when hex-designer tab is accessed
+    const hexDesignerTab = document.querySelector('[data-tab="hex-designer"]');
+    if (hexDesignerTab) {
+        hexDesignerTab.addEventListener('click', function() {
+            setTimeout(() => {
+                if (!document.getElementById('hex-designer-content').innerHTML.trim()) {
+                    loadHexDesigner();
                 }
             }, 100);
         });
@@ -192,20 +204,25 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Check if hex editor tab is active on page load and load content if needed
+    // Check if hex board editor tab is active on page load and load content if needed
     setTimeout(() => {
         const activeTab = document.querySelector('.nav-link.active');
-        if (activeTab && activeTab.dataset.tab === 'hex-editor') {
-            const hexEditorContent = document.getElementById('hex-editor-content');
-            if (hexEditorContent && !hexEditorContent.innerHTML.trim()) {
-                loadHexEditor();
+        if (activeTab && activeTab.dataset.tab === 'hex-board-editor') {
+            const hexBoardEditorContent = document.getElementById('hex-board-editor-content');
+            if (hexBoardEditorContent && !hexBoardEditorContent.innerHTML.trim()) {
+                loadHexBoardEditor();
+            }
+        } else if (activeTab && activeTab.dataset.tab === 'hex-designer') {
+            const hexDesignerContent = document.getElementById('hex-designer-content');
+            if (hexDesignerContent && !hexDesignerContent.innerHTML.trim()) {
+                loadHexDesigner();
             }
         }
     }, 200);
 
     console.log('Core Website Framework initialized successfully!');
     console.log('Keyboard shortcuts:');
-    console.log('- Alt + 1-3: Switch tabs');
+    console.log('- Alt + 1-4: Switch tabs');
     console.log('- Ctrl + T: Toggle theme');
 });
 
@@ -285,11 +302,11 @@ async function loadUtility(utilityName) {
     }
 }
 
-// Load hex editor content and initialize
-async function loadHexEditor() {
-    console.log('Loading hex editor...');
+// Load hex board editor content and initialize
+async function loadHexBoardEditor() {
+    console.log('Loading hex board editor...');
     try {
-        const response = await fetch('hex-editor/hex-editor.html');
+        const response = await fetch('hex-board-editor/hex-board-editor.html');
         console.log('Fetch response:', response.status);
         
         if (!response.ok) {
@@ -299,9 +316,9 @@ async function loadHexEditor() {
         const htmlContent = await response.text();
         console.log('HTML content loaded, length:', htmlContent.length);
         
-        const container = document.getElementById('hex-editor-content');
+        const container = document.getElementById('hex-board-editor-content');
         if (!container) {
-            throw new Error('hex-editor-content container not found');
+            throw new Error('hex-board-editor-content container not found');
         }
         
         container.innerHTML = htmlContent;
@@ -309,17 +326,56 @@ async function loadHexEditor() {
         
         // Wait a bit for DOM to update, then initialize
         setTimeout(() => {
-            console.log('Attempting to initialize hex editor...');
-            if (typeof initializeHexEditor === 'function') {
-                console.log('initializeHexEditor function found, calling it...');
-                initializeHexEditor();
+            console.log('Attempting to initialize hex board editor...');
+            if (typeof initializeHexBoardEditor === 'function') {
+                console.log('initializeHexBoardEditor function found, calling it...');
+                initializeHexBoardEditor();
             } else {
-                console.error('initializeHexEditor function not found');
+                console.error('initializeHexBoardEditor function not found');
                 console.log('Available functions:', Object.keys(window).filter(key => key.includes('hex') || key.includes('Hex')));
             }
         }, 100);
     } catch (error) {
-        console.error('Failed to load hex editor:', error);
-        document.getElementById('hex-editor-content').innerHTML = `<p>Failed to load hex editor: ${error.message}</p>`;
+        console.error('Failed to load hex board editor:', error);
+        document.getElementById('hex-board-editor-content').innerHTML = `<p>Failed to load hex board editor: ${error.message}</p>`;
+    }
+}
+
+// Load hex designer content and initialize
+async function loadHexDesigner() {
+    console.log('Loading hex designer...');
+    try {
+        const response = await fetch('hex-designer/hex-designer.html');
+        console.log('Fetch response:', response.status);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const htmlContent = await response.text();
+        console.log('HTML content loaded, length:', htmlContent.length);
+        
+        const container = document.getElementById('hex-designer-content');
+        if (!container) {
+            throw new Error('hex-designer-content container not found');
+        }
+        
+        container.innerHTML = htmlContent;
+        console.log('HTML content inserted');
+        
+        // Wait a bit for DOM to update, then initialize
+        setTimeout(() => {
+            console.log('Attempting to initialize hex designer...');
+            if (typeof initializeHexDesigner === 'function') {
+                console.log('initializeHexDesigner function found, calling it...');
+                initializeHexDesigner();
+            } else {
+                console.error('initializeHexDesigner function not found');
+                console.log('Available functions:', Object.keys(window).filter(key => key.includes('hex') || key.includes('Hex')));
+            }
+        }, 100);
+    } catch (error) {
+        console.error('Failed to load hex designer:', error);
+        document.getElementById('hex-designer-content').innerHTML = `<p>Failed to load hex designer: ${error.message}</p>`;
     }
 }

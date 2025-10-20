@@ -1,0 +1,56 @@
+/* Hex Designer Specific Styles */
+.hex-designer-container {
+    display: flex;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+#hex-designer-radius-value, #hex-designer-line-width-value {
+    font-weight: bold;
+    color: var(--text-color);
+    background: var(--bg-color);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0;
+    border: 1px solid var(--border-color);
+}
+
+/* Compact color palette adjustment */
+.color-palette.compact .color-option {
+    width: 28px;
+    height: 28px;
+    border-width: 1px;
+}
+
+/* Instructions styling */
+.instructions {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0;
+    border-left: 4px solid var(--genomic-green);
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.instructions h3 {
+    font-family: 'Roboto Slab', serif;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    color: var(--genomic-green);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.instructions ul {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+.instructions li {
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+.instructions strong {
+    color: var(--wolfpack-red);
+}

@@ -1,14 +1,15 @@
             <div class="instructions">
                 <h3>How to Use:</h3>
                 <ul>
-                    <li><strong>Colors Tab:</strong> Paint hex cells and add circles</li>
+                    <li><strong>Colors Tab:</strong> Paint hex cells and add symbols (circle, crosshair, person)</li>
                     <li><strong>Lines Tab:</strong> Draw lines and arrows between hex centers</li>
                     <li><strong>Left-click + drag:</strong> Paint cells or draw lines between hexes</li>
-                    <li><strong>Right-click:</strong> Add colored circles to hex cells (Colors tab) or remove lines (Lines tab)</li>
+                    <li><strong>Right-click:</strong> Add colored symbols to hex cells (Colors tab) or remove lines (Lines tab)</li>
+                    <li><strong>Symbol Selection:</strong> Choose symbol type before right-clicking on hexes</li>
                 </ul>
             </div>
             
-            <div class="hex-editor-container">
+            <div class="hex-board-editor-container">
                 <div class="hex-controls">
                     <div class="control-group">
                         <label for="hex-radius">Board Radius:</label>
@@ -50,6 +51,31 @@
                                 <div class="color-option" data-color="#ff3333" style="background-color: #ff3333;" title="Red"></div>
                                 <div class="color-option" data-color="#009900" style="background-color: #009900;" title="Green"></div>
                                 <div class="color-option" data-color="#70bfff" style="background-color: #70bfff;" title="Blue"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="control-group">
+                            <label>Symbol Type (Right-click):</label>
+                            <div class="symbol-type-options">
+                                <button class="symbol-type-btn active" data-symbol-type="circle" title="Circle">
+                                    <svg width="30" height="30" viewBox="0 0 30 30">
+                                        <circle cx="15" cy="15" r="8" fill="currentColor"/>
+                                    </svg>
+                                </button>
+                                <button class="symbol-type-btn" data-symbol-type="crosshair" title="Crosshair">
+                                    <svg width="30" height="30" viewBox="0 0 30 30">
+                                        <circle cx="15" cy="15" r="8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                                        <line x1="5" y1="15" x2="25" y2="15" stroke="currentColor" stroke-width="1.5"/>
+                                        <line x1="15" y1="5" x2="15" y2="25" stroke="currentColor" stroke-width="1.5"/>
+                                        <circle cx="15" cy="15" r="1.5" fill="currentColor"/>
+                                    </svg>
+                                </button>
+                                <button class="symbol-type-btn" data-symbol-type="person" title="Person">
+                                    <svg width="30" height="30" viewBox="0 0 30 30">
+                                        <circle cx="15" cy="10" r="4" fill="currentColor"/>
+                                        <path d="M 8 25 L 10 17 Q 11 15 15 15 Q 19 15 20 17 L 22 25 Z" fill="currentColor"/>
+                                    </svg>
+                                </button>
                             </div>
                         </div>
                         

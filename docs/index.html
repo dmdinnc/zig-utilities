@@ -8,7 +8,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Roboto+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto+Slab:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="hex-editor/hex-editor.css">
+    <link rel="stylesheet" href="hex-common/hex-common.css">
+    <link rel="stylesheet" href="hex-board-editor/hex-board-editor.css">
+    <link rel="stylesheet" href="hex-designer/hex-designer.css">
 </head>
 <body>
     <header>
@@ -26,7 +28,8 @@
                             <a href="#" class="dropdown-item" data-utility="image-converter">Image Format Converter</a>
                         </div>
                     </li>
-                    <li><a href="#hex-editor" class="nav-link" data-tab="hex-editor">Hex Editor</a></li>
+                    <li><a href="#hex-board-editor" class="nav-link" data-tab="hex-board-editor">Hex Board Editor</a></li>
+                    <li><a href="#hex-designer" class="nav-link" data-tab="hex-designer">Hex Designer</a></li>
                 </ul>
                 <div class="theme-toggle">
                     <span class="theme-label">DARK</span>
@@ -51,9 +54,13 @@
                         <h3>🛠️ Utilities</h3>
                         <p>Access various utility tools and applications</p>
                     </div>
-                    <div class="feature-card" data-nav-tab="hex-editor">
-                        <h3>⬡ Hex Editor</h3>
+                    <div class="feature-card" data-nav-tab="hex-board-editor">
+                        <h3>⬡ Hex Board Editor</h3>
                         <p>Create and edit hexagonal grid boards with customizable colors</p>
+                    </div>
+                    <div class="feature-card" data-nav-tab="hex-designer">
+                        <h3>✨ Hex Designer</h3>
+                        <p>Design custom hex shapes by selecting tiles and export with dynamic borders</p>
                     </div>
                 </div>
             </div>
@@ -85,17 +92,26 @@
             </div>
         </div>
 
-        <!-- Hex Editor Tab Content -->
-        <div id="hex-editor" class="tab-content">
+        <!-- Hex Board Editor Tab Content -->
+        <div id="hex-board-editor" class="tab-content">
             <h2>Hexagonal Board Editor</h2>
             <p>Create and customize hexagonal grid boards with adjustable size and colors.</p>
-            <div id="hex-editor-content"></div>
+            <div id="hex-board-editor-content"></div>
+        </div>
+
+        <!-- Hex Designer Tab Content -->
+        <div id="hex-designer" class="tab-content">
+            <h2>Hex Designer</h2>
+            <p>Design custom hexagonal shapes by selecting and painting tiles. Export with dynamic borders around your selection.</p>
+            <div id="hex-designer-content"></div>
         </div>
 
     </main>
 
 
     <script src="script.js"></script>
-    <script src="hex-editor/hex-editor.js"></script>
+    <script src="hex-common/hex-common.js"></script>
+    <script src="hex-board-editor/hex-board-editor.js"></script>
+    <script src="hex-designer/hex-designer.js"></script>
 </body>
 </html>

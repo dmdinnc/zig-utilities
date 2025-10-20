@@ -1,0 +1,298 @@
+/* Hex Common Styles - Shared styles for hex-based tools */
+
+/* Container Layout */
+.hex-controls {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 0;
+    box-shadow: 0 1px 4px rgba(66, 126, 147, 0.2);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--bio-indigo);
+    min-width: 320px;
+    height: fit-content;
+}
+
+/* Control Panel Tabs */
+.control-tabs {
+    display: flex;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.control-tab {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: none;
+    background: transparent;
+    color: var(--text-color);
+    cursor: pointer;
+    font-weight: 600;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.control-tab:hover {
+    background: var(--border-color);
+}
+
+.control-tab.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+.control-tab-content {
+    display: none;
+}
+
+.control-tab-content.active {
+    display: block;
+}
+
+/* Control Groups */
+.control-group {
+    margin-bottom: 2rem;
+}
+
+.control-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.control-group input[type="range"] {
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+/* Color Palette */
+.color-palette {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.color-palette.compact {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.25rem;
+}
+
+.color-option {
+    width: 40px;
+    height: 40px;
+    border-radius: 0;
+    cursor: pointer;
+    border: 2px solid var(--border-color);
+    transition: all 0.2s ease;
+}
+
+.color-option:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(103, 138, 234, 0.4);
+}
+
+.color-option.selected {
+    border: 3px solid var(--primary-color);
+    box-shadow: 0 0 0 2px var(--card-bg), 0 0 0 4px var(--primary-color);
+    transform: scale(1.05);
+}
+
+.color-option.transparent-option {
+    position: relative;
+    background: white;
+}
+
+.transparent-pattern {
+    width: 100%;
+    height: 100%;
+    background: 
+        linear-gradient(45deg, #ccc 25%, transparent 25%),
+        linear-gradient(-45deg, #ccc 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #ccc 75%),
+        linear-gradient(-45deg, transparent 75%, #ccc 75%);
+    background-size: 8px 8px;
+    background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
+}
+
+/* Custom Color Input */
+.control-group input[type="color"] {
+    width: 60px;
+    height: 40px;
+    border: 2px solid var(--border-color);
+    border-radius: 0;
+    cursor: pointer;
+    padding: 0;
+}
+
+.control-group input[type="text"] {
+    width: calc(100% - 70px);
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0;
+    background: var(--bg-color);
+    color: var(--text-color);
+    font-family: monospace;
+    margin-left: 0.5rem;
+}
+
+/* Symbol Type Buttons */
+.symbol-type-options {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.symbol-type-btn {
+    padding: 0.5rem;
+    border: 2px solid var(--border-color);
+    background: var(--card-bg);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 0;
+    color: var(--text-color);
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.symbol-type-btn:hover {
+    background: var(--border-color);
+}
+
+.symbol-type-btn.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+/* Line Type Buttons */
+.line-type-options {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.line-type-btn {
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border-color);
+    background: var(--card-bg);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 0;
+    color: var(--text-color);
+    flex: 1;
+    min-width: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.line-type-btn:hover {
+    background: var(--border-color);
+}
+
+.line-type-btn.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+/* Background Type Radio Buttons */
+.background-type-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 0;
+    transition: background 0.2s ease;
+}
+
+.radio-label:hover {
+    background: var(--border-color);
+}
+
+.radio-label input[type="radio"] {
+    cursor: pointer;
+}
+
+/* Buttons */
+.btn-primary, .btn-secondary {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--bio-indigo);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(103, 138, 234, 0.3);
+}
+
+.btn-secondary {
+    background: var(--border-color);
+    color: var(--text-color);
+}
+
+.btn-secondary:hover {
+    background: var(--text-color);
+    color: var(--bg-color);
+}
+
+/* Hex Board Container */
+.hex-board-container {
+    flex: 1;
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 0;
+    box-shadow: 0 1px 4px rgba(66, 126, 147, 0.2);
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hex-board-container svg {
+    max-width: 100%;
+    max-height: 600px;
+    border: 1px solid var(--border-color);
+}
+
+/* Hex Cell Styles */
+.hex-cell {
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.hex-cell:hover {
+    opacity: 0.8;
+}
+
+.hex-cell.inactive {
+    opacity: 0.2;
+}
+
+.hex-cell.active {
+    opacity: 1;
+}

@@ -1,5 +1,5 @@
-// Hex Editor Implementation
-function initializeHexEditor() {
+// Hex Board Editor Implementation
+function initializeHexBoardEditor() {
     let currentColor = '#ffffff';
     let backgroundColor = '#ffffff';
     let backgroundType = 'hexagon'; // 'solid', 'none', 'hexagon'
@@ -8,8 +8,9 @@ function initializeHexEditor() {
     let hexagonStrokeWidth = 1;
     let hexRadius = 3;
     let hexData = new Map(); // Store hex colors by coordinates
-    let hexCircleData = new Map(); // Store circle colors by coordinates
+    let hexSymbolData = new Map(); // Store symbols (type and color) by coordinates
     let lineData = new Map(); // Store lines by ID
+    let currentSymbolType = 'circle'; // Default symbol type
     let isDragging = false;
     let dragStarted = false;
     let currentMode = 'colors'; // 'colors' or 'lines'
@@ -53,6 +54,7 @@ function initializeHexEditor() {
     const lineHexInput = document.getElementById('line-hex-input');
     const lineWidthSlider = document.getElementById('line-width');
     const lineWidthValue = document.getElementById('line-width-value');
+    const symbolTypeButtons = document.querySelectorAll('.symbol-type-btn');
 
     if (!radiusSlider) return; // Exit if hex editor elements don't exist
 
@@ -60,7 +62,7 @@ function initializeHexEditor() {
     colorOptions[0].classList.add('selected');
     
     // Debug: Log initial setup
-    console.log('Hex editor initialized, current color:', currentColor);
+    console.log('Hex board editor initialized, current color:', currentColor);
 
     // Radius slider functionality
     radiusSlider.addEventListener('input', function() {
@@ -75,8 +77,7 @@ function initializeHexEditor() {
             colorOptions.forEach(opt => opt.classList.remove('selected'));
             this.classList.add('selected');
             currentColor = this.dataset.color;
-            customColorPicker.value = currentColor;
-            hexInput.value = currentColor;
+            syncColorInputs(customColorPicker, hexInput, currentColor);
             console.log('Color selected:', currentColor);
         });
     });
@@ -90,10 +91,9 @@ function initializeHexEditor() {
 
     // Hex input field
     hexInput.addEventListener('input', function() {
-        const value = this.value;
-        if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
-            currentColor = value;
-            customColorPicker.value = value;
+        if (/^#[0-9A-Fa-f]{6}$/.test(this.value)) {
+            currentColor = this.value;
+            customColorPicker.value = this.value;
             colorOptions.forEach(opt => opt.classList.remove('selected'));
         }
     });
@@ -112,16 +112,15 @@ function initializeHexEditor() {
     // Background color picker
     backgroundColorPicker.addEventListener('input', function() {
         backgroundColor = this.value;
-        backgroundHexInput.value = this.value;
+        syncColorInputs(backgroundColorPicker, backgroundHexInput, this.value);
         updateBackgroundColor();
     });
 
     // Background hex input field
     backgroundHexInput.addEventListener('input', function() {
-        const value = this.value;
-        if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
-            backgroundColor = value;
-            backgroundColorPicker.value = value;
+        if (/^#[0-9A-Fa-f]{6}$/.test(this.value)) {
+            backgroundColor = this.value;
+            backgroundColorPicker.value = this.value;
             updateBackgroundColor();
         }
     });
@@ -129,30 +128,28 @@ function initializeHexEditor() {
     // Hexagon background controls
     hexagonBgColorPicker.addEventListener('input', function() {
         hexagonBgColor = this.value;
-        hexagonBgHexInput.value = this.value;
+        syncColorInputs(hexagonBgColorPicker, hexagonBgHexInput, this.value);
         updateBackgroundColor();
     });
 
     hexagonBgHexInput.addEventListener('input', function() {
-        const value = this.value;
-        if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
-            hexagonBgColor = value;
-            hexagonBgColorPicker.value = value;
+        if (/^#[0-9A-Fa-f]{6}$/.test(this.value)) {
+            hexagonBgColor = this.value;
+            hexagonBgColorPicker.value = this.value;
             updateBackgroundColor();
         }
     });
 
     hexagonStrokeColorPicker.addEventListener('input', function() {
         hexagonStrokeColor = this.value;
-        hexagonStrokeHexInput.value = this.value;
+        syncColorInputs(hexagonStrokeColorPicker, hexagonStrokeHexInput, this.value);
         updateBackgroundColor();
     });
 
     hexagonStrokeHexInput.addEventListener('input', function() {
-        const value = this.value;
-        if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
-            hexagonStrokeColor = value;
-            hexagonStrokeColorPicker.value = value;
+        if (/^#[0-9A-Fa-f]{6}$/.test(this.value)) {
+            hexagonStrokeColor = this.value;
+            hexagonStrokeColorPicker.value = this.value;
             updateBackgroundColor();
         }
     });
@@ -198,28 +195,28 @@ function initializeHexEditor() {
         });
     });
 
-    // Line type selection
-    lineTypeButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            lineTypeButtons.forEach(btn => btn.classList.remove('active'));
-            this.classList.add('active');
-            currentLineType = this.dataset.lineType;
-            console.log('Line type selected:', currentLineType);
-        });
+    // Line type and symbol type selection using helper
+    setupButtonGroup(lineTypeButtons, type => {
+        currentLineType = type;
+        console.log('Line type selected:', type);
+    });
+    
+    setupButtonGroup(symbolTypeButtons, type => {
+        currentSymbolType = type;
+        console.log('Symbol type selected:', type);
     });
 
     // Line color picker
     lineColorPicker.addEventListener('input', function() {
         currentLineColor = this.value;
-        lineHexInput.value = this.value;
+        syncColorInputs(lineColorPicker, lineHexInput, this.value);
     });
 
     // Line hex input
     lineHexInput.addEventListener('input', function() {
-        const value = this.value;
-        if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
-            currentLineColor = value;
-            lineColorPicker.value = value;
+        if (/^#[0-9A-Fa-f]{6}$/.test(this.value)) {
+            currentLineColor = this.value;
+            lineColorPicker.value = this.value;
         }
     });
 
@@ -232,16 +229,15 @@ function initializeHexEditor() {
     // Border color picker
     borderColorPicker.addEventListener('input', function() {
         hexBorderColor = this.value;
-        borderHexInput.value = this.value;
+        syncColorInputs(borderColorPicker, borderHexInput, this.value);
         updateHexBorderColors();
     });
 
     // Border hex input
     borderHexInput.addEventListener('input', function() {
-        const value = this.value;
-        if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
-            hexBorderColor = value;
-            borderColorPicker.value = value;
+        if (/^#[0-9A-Fa-f]{6}$/.test(this.value)) {
+            hexBorderColor = this.value;
+            borderColorPicker.value = this.value;
             updateHexBorderColors();
         }
     });
@@ -249,45 +245,13 @@ function initializeHexEditor() {
     // Clear board
     clearButton.addEventListener('click', function() {
         hexData.clear();
-        hexCircleData.clear();
+        hexSymbolData.clear();
         lineData.clear();
         generateHexBoard();
     });
 
     // Export board
     exportButton.addEventListener('click', exportHexBoard);
-
-    // Generate hexagonal coordinates
-    function generateHexCoordinates(radius) {
-        const coords = [];
-        for (let q = -radius; q <= radius; q++) {
-            const r1 = Math.max(-radius, -q - radius);
-            const r2 = Math.min(radius, -q + radius);
-            for (let r = r1; r <= r2; r++) {
-                coords.push({ q, r, s: -q - r });
-            }
-        }
-        return coords;
-    }
-
-    // Convert hex coordinates to pixel coordinates (flat-top orientation)
-    function hexToPixel(q, r, size) {
-        const x = size * (Math.sqrt(3) * q + Math.sqrt(3)/2 * r);
-        const y = size * (3/2 * r);
-        return { x, y };
-    }
-
-    // Generate hexagon path (flat-top orientation)
-    function generateHexPath(centerX, centerY, size) {
-        const points = [];
-        for (let i = 0; i < 6; i++) {
-            const angle = (Math.PI / 3) * i + (Math.PI / 6); // Rotate by 30 degrees for flat-top
-            const x = centerX + size * Math.cos(angle);
-            const y = centerY + size * Math.sin(angle);
-            points.push(`${x},${y}`);
-        }
-        return `M ${points.join(' L ')} Z`;
-    }
 
     // Update background controls visibility
     function updateBackgroundControls() {
@@ -537,19 +501,11 @@ function initializeHexEditor() {
             // Store coordinate key on the element for debugging
             hexElement.dataset.coord = coordKey;
             
-            // Restore circles if they exist
-            const savedCircleColor = hexCircleData.get(coordKey);
-            if (savedCircleColor) {
+            // Restore symbols if they exist
+            const savedSymbol = hexSymbolData.get(coordKey);
+            if (savedSymbol) {
                 setTimeout(() => {
-                    const circleId = `circle-${coordKey.replace(/,/g, '_').replace(/-/g, 'n')}`;
-                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                    circle.setAttribute('id', circleId);
-                    circle.setAttribute('cx', pixel.x);
-                    circle.setAttribute('cy', pixel.y);
-                    circle.setAttribute('r', hexSize * 0.4);
-                    circle.setAttribute('fill', savedCircleColor);
-                    circle.style.pointerEvents = 'none';
-                    hexBoard.appendChild(circle);
+                    addSymbolToHex(coordKey, pixel, savedSymbol.type, savedSymbol.color, hexSize);
                 }, 0);
             }
             
@@ -565,28 +521,20 @@ function initializeHexEditor() {
                 hexData.set(coord, currentColor);
             }
             
-            // Add circle function
-            function addCircle(coord, pixel) {
-                const circleId = `circle-${coord.replace(/,/g, '_').replace(/-/g, 'n')}`;
-                const existingCircle = hexBoard.querySelector(`#${circleId}`);
+            // Add symbol function
+            function addSymbol(coord, pixel) {
+                const symbolId = `symbol-${coord.replace(/,/g, '_').replace(/-/g, 'n')}`;
+                const existingSymbol = hexBoard.querySelector(`#${symbolId}`);
                 
-                if (existingCircle) {
-                    existingCircle.remove();
+                if (existingSymbol) {
+                    existingSymbol.remove();
                 }
                 
                 if (currentColor !== 'transparent') {
-                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                    circle.setAttribute('id', circleId);
-                    circle.setAttribute('cx', pixel.x);
-                    circle.setAttribute('cy', pixel.y);
-                    circle.setAttribute('r', hexSize * 0.4); // Larger circle
-                    circle.setAttribute('fill', currentColor);
-                    circle.style.pointerEvents = 'none'; // Don't interfere with hex clicks
-                    
-                    hexBoard.appendChild(circle);
-                    hexCircleData.set(coord, currentColor);
+                    addSymbolToHex(coord, pixel, currentSymbolType, currentColor, hexSize);
+                    hexSymbolData.set(coord, { type: currentSymbolType, color: currentColor });
                 } else {
-                    hexCircleData.delete(coord);
+                    hexSymbolData.delete(coord);
                 }
             }
             
@@ -642,12 +590,12 @@ function initializeHexEditor() {
                 }
             });
             
-            // Right-click event for circles (only in colors mode)
+            // Right-click event for symbols (only in colors mode)
             hexElement.addEventListener('contextmenu', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 if (currentMode === 'colors') {
-                    addCircle(coordKey, pixel);
+                    addSymbol(coordKey, pixel);
                 }
             });
 
@@ -658,6 +606,14 @@ function initializeHexEditor() {
         lineData.forEach((lineInfo, lineId) => {
             drawStoredLine(lineInfo);
         });
+    }
+
+    // Add symbol to hex cell using shared renderSymbol from hex-common.js
+    function addSymbolToHex(coordKey, pixel, symbolType, color, hexSize) {
+        const symbolElement = renderSymbol(coordKey, pixel, symbolType, color, hexSize);
+        if (symbolElement) {
+            hexBoard.appendChild(symbolElement);
+        }
     }
 
     // Line drawing functions
@@ -1069,4 +1025,4 @@ function initializeHexEditor() {
 }
 
 // Make function globally available
-window.initializeHexEditor = initializeHexEditor;
+window.initializeHexBoardEditor = initializeHexBoardEditor;
