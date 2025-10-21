@@ -130,10 +130,10 @@ function sanitizeCoordId(coordKey) {
 // Render symbols (circle, crosshair, person) on hex cells
 function renderSymbol(coordKey, pixel, symbolType, color, hexSize) {
     const symbolId = `symbol-${sanitizeCoordId(coordKey)}`;
-    const size = hexSize * 0.4; // Symbol size relative to hex
+    const size = hexSize * 0.48; // Symbol size relative to hex
     let symbolElement;
     
-    const strokeWidth = size * 0.38;
+    const strokeWidth = size * 0.25;
     
     switch(symbolType) {
         case 'circle':
@@ -145,7 +145,7 @@ function renderSymbol(coordKey, pixel, symbolType, color, hexSize) {
         case 'crosshair':
             symbolElement = createSVG('g');
             symbolElement.appendChild(createSVG('circle', {
-                cx: pixel.x, cy: pixel.y, r: size,
+                cx: pixel.x, cy: pixel.y, r: size * 0.85,
                 fill: 'none', stroke: color, 'stroke-width': strokeWidth
             }));
             symbolElement.appendChild(createSVG('line', {
@@ -165,14 +165,16 @@ function renderSymbol(coordKey, pixel, symbolType, color, hexSize) {
             
         case 'person':
             symbolElement = createSVG('g');
+            const personSize = size * 1.2; // Person symbol is 20% larger
+            const yOffset = personSize * 0.15; // Shift up to reduce top space
             symbolElement.appendChild(createSVG('circle', {
-                cx: pixel.x, cy: pixel.y - size * 0.4, r: size * 0.4, fill: color
+                cx: pixel.x, cy: pixel.y - personSize * 0.4 - yOffset, r: personSize * 0.4, fill: color
             }));
-            const bodyPath = `M ${pixel.x - size * 0.7} ${pixel.y + size}
-                L ${pixel.x - size * 0.5} ${pixel.y + size * 0.2}
-                Q ${pixel.x - size * 0.4} ${pixel.y} ${pixel.x} ${pixel.y}
-                Q ${pixel.x + size * 0.4} ${pixel.y} ${pixel.x + size * 0.5} ${pixel.y + size * 0.2}
-                L ${pixel.x + size * 0.7} ${pixel.y + size} Z`;
+            const bodyPath = `M ${pixel.x - personSize * 0.7} ${pixel.y + personSize - yOffset}
+                L ${pixel.x - personSize * 0.5} ${pixel.y + personSize * 0.2 - yOffset}
+                Q ${pixel.x - personSize * 0.4} ${pixel.y - yOffset} ${pixel.x} ${pixel.y - yOffset}
+                Q ${pixel.x + personSize * 0.4} ${pixel.y - yOffset} ${pixel.x + personSize * 0.5} ${pixel.y + personSize * 0.2 - yOffset}
+                L ${pixel.x + personSize * 0.7} ${pixel.y + personSize - yOffset} Z`;
             symbolElement.appendChild(createSVG('path', { d: bodyPath, fill: color }));
             break;
             
