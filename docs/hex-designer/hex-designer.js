@@ -264,6 +264,12 @@ function initializeHexDesigner() {
             
             // Activate hex function
             function activateHex(element, coord) {
+                // Handle delete color - deactivate the hex
+                if (currentColor === 'delete') {
+                    deactivateHex(element, coord);
+                    return;
+                }
+                
                 if (!activeHexes.has(coord)) {
                     activeHexes.add(coord);
                     element.classList.remove('inactive');
@@ -274,6 +280,37 @@ function initializeHexDesigner() {
                 element.style.fill = currentColor === 'transparent' ? 'none' : currentColor;
                 element.setAttribute('fill', currentColor === 'transparent' ? 'none' : currentColor);
                 hexData.set(coord, currentColor);
+            }
+            
+            // Deactivate hex function
+            function deactivateHex(element, coord) {
+                // Remove from active hexes
+                activeHexes.delete(coord);
+                hexData.delete(coord);
+                
+                // Remove visual state
+                element.classList.remove('active');
+                element.classList.add('inactive');
+                element.setAttribute('fill', 'transparent');
+                element.style.fill = 'transparent';
+                element.setAttribute('stroke', 'none');
+                
+                // Remove any symbols on this hex
+                const symbolId = `symbol-${coord.replace(/,/g, '_').replace(/-/g, 'n')}`;
+                const existingSymbol = hexBoard.querySelector(`#${symbolId}`);
+                if (existingSymbol) {
+                    existingSymbol.remove();
+                }
+                hexSymbolData.delete(coord);
+                
+                // Remove any lines connected to this hex
+                const linesToRemove = [];
+                lineData.forEach((lineInfo, lineId) => {
+                    if (lineInfo.startCoord === coord || lineInfo.endCoord === coord) {
+                        linesToRemove.push(lineId);
+                    }
+                });
+                linesToRemove.forEach(lineId => removeLine(lineId));
             }
             
             // Add symbol function
@@ -301,7 +338,18 @@ function initializeHexDesigner() {
                 if (e.button === 0 && !isDragging) { // Only left-click (button 0)
                     if (currentMode === 'colors') {
                         activateHex(this, coordKey);
-                    } else if (currentMode === 'lines' && activeHexes.has(coordKey)) {
+                    } else if (currentMode === 'lines') {
+                        // Auto-activate inactive hexes as transparent for line drawing
+                        if (!activeHexes.has(coordKey)) {
+                            activeHexes.add(coordKey);
+                            this.classList.remove('inactive');
+                            this.classList.add('active');
+                            this.setAttribute('stroke', hexBorderColor);
+                            this.style.stroke = hexBorderColor;
+                            this.style.fill = 'none';
+                            this.setAttribute('fill', 'none');
+                            hexData.set(coordKey, 'transparent');
+                        }
                         handleLineDrawing(coordKey, pixel);
                     }
                 }
@@ -315,7 +363,18 @@ function initializeHexDesigner() {
                         isDragging = true;
                         dragStarted = true;
                         activateHex(this, coordKey);
-                    } else if (currentMode === 'lines' && activeHexes.has(coordKey)) {
+                    } else if (currentMode === 'lines') {
+                        // Auto-activate inactive hexes as transparent for line drawing
+                        if (!activeHexes.has(coordKey)) {
+                            activeHexes.add(coordKey);
+                            this.classList.remove('inactive');
+                            this.classList.add('active');
+                            this.setAttribute('stroke', hexBorderColor);
+                            this.style.stroke = hexBorderColor;
+                            this.style.fill = 'none';
+                            this.setAttribute('fill', 'none');
+                            hexData.set(coordKey, 'transparent');
+                        }
                         isDrawingLine = true;
                         lineStartHex = { coord: coordKey, pixel: pixel };
                     }
@@ -326,7 +385,7 @@ function initializeHexDesigner() {
             hexElement.addEventListener('mouseenter', function(e) {
                 if (currentMode === 'colors' && isDragging && dragStarted) {
                     activateHex(this, coordKey);
-                } else if (currentMode === 'lines' && isDrawingLine && lineStartHex && activeHexes.has(coordKey)) {
+                } else if (currentMode === 'lines' && isDrawingLine && lineStartHex) {
                     showLinePreview(lineStartHex.pixel, pixel);
                 }
             });
@@ -337,7 +396,18 @@ function initializeHexDesigner() {
                     if (currentMode === 'colors') {
                         isDragging = false;
                         dragStarted = false;
-                    } else if (currentMode === 'lines' && isDrawingLine && lineStartHex && activeHexes.has(coordKey)) {
+                    } else if (currentMode === 'lines' && isDrawingLine && lineStartHex) {
+                        // Auto-activate inactive hexes as transparent for line drawing
+                        if (!activeHexes.has(coordKey)) {
+                            activeHexes.add(coordKey);
+                            this.classList.remove('inactive');
+                            this.classList.add('active');
+                            this.setAttribute('stroke', hexBorderColor);
+                            this.style.stroke = hexBorderColor;
+                            this.style.fill = 'none';
+                            this.setAttribute('fill', 'none');
+                            hexData.set(coordKey, 'transparent');
+                        }
                         drawLine(lineStartHex.coord, coordKey, lineStartHex.pixel, pixel);
                         isDrawingLine = false;
                         lineStartHex = null;
