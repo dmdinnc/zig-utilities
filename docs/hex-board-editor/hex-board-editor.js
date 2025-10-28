@@ -1,5 +1,11 @@
 // Hex Board Editor Implementation
 function initializeHexBoardEditor() {
+    // Initialize color palettes (no delete option for board editor)
+    initializeColorPalettes('#colors-controls', {
+        basic: { type: 'basic' },
+        author: { type: 'author' }
+    });
+    
     let currentColor = '#ffffff';
     let backgroundColor = '#ffffff';
     let backgroundType = 'hexagon'; // 'solid', 'none', 'hexagon'

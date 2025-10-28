@@ -283,6 +283,7 @@
 .hex-cell {
     cursor: pointer;
     transition: opacity 0.2s ease;
+    pointer-events: all; /* Ensure transparent hexes are clickable */
 }
 
 .hex-cell:hover {

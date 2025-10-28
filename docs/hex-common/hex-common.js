@@ -7,6 +7,31 @@ const HEX_CONSTANTS = {
     HEX_COLOR_REGEX: /^#[0-9A-Fa-f]{6}$/
 };
 
+// ===== Shared Color Palettes =====
+const COLOR_PALETTES = {
+    basic: [
+        { color: '#ff0000', title: 'Red' },
+        { color: '#00ff00', title: 'Green' },
+        { color: '#0000ff', title: 'Blue' },
+        { color: '#ffff00', title: 'Yellow' },
+        { color: '#ff00ff', title: 'Magenta' },
+        { color: '#00ffff', title: 'Cyan' },
+        { color: '#000000', title: 'Black' },
+        { color: '#ffffff', title: 'White', border: true },
+        { color: 'transparent', title: 'Transparent', special: 'transparent' }
+    ],
+    author: [
+        { color: '#323232', title: 'Dark Grey' },
+        { color: '#787878', title: 'Grey' },
+        { color: '#ffff70', title: 'Yellow' },
+        { color: '#ff6600', title: 'Orange' },
+        { color: '#ff3333', title: 'Red' },
+        { color: '#ff7ad5', title: 'Pink' },
+        { color: '#009900', title: 'Green' },
+        { color: '#70bfff', title: 'Blue' }
+    ]
+};
+
 // ===== Hex Coordinate & Geometry Functions =====
 
 // Generate hexagonal grid coordinates using cube coordinates
@@ -68,6 +93,44 @@ function setupButtonGroup(buttons, callback) {
             const dataKey = Object.keys(this.dataset)[0];
             callback(this.dataset[dataKey]);
         });
+    });
+}
+
+// Generate color palette HTML from configuration
+function generateColorPalette(paletteType, additionalColors = []) {
+    const colors = COLOR_PALETTES[paletteType] || [];
+    const allColors = [...colors, ...additionalColors];
+    
+    return allColors.map(colorConfig => {
+        const { color, title, border, special } = colorConfig;
+        
+        if (special === 'transparent') {
+            return `<div class="color-option transparent-option" data-color="transparent" title="${title}">
+                        <div class="transparent-pattern"></div>
+                    </div>`;
+        } else if (special === 'delete') {
+            return `<div class="color-option delete-option" data-color="delete" title="${title}" 
+                        style="display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; color: #ff0000;">
+                        ×
+                    </div>`;
+        } else {
+            const borderStyle = border ? ' border: 1px solid #ccc;' : '';
+            return `<div class="color-option" data-color="${color}" style="background-color: ${color};${borderStyle}" title="${title}"></div>`;
+        }
+    }).join('\n');
+}
+
+// Initialize color palettes in a container
+function initializeColorPalettes(containerSelector, palettes) {
+    const container = document.querySelector(containerSelector);
+    if (!container) return;
+    
+    Object.entries(palettes).forEach(([label, config]) => {
+        const paletteHtml = generateColorPalette(config.type, config.additional || []);
+        const paletteContainer = container.querySelector(`[data-palette="${label}"]`);
+        if (paletteContainer) {
+            paletteContainer.innerHTML = paletteHtml;
+        }
     });
 }
 

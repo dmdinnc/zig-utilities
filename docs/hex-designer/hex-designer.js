@@ -1,5 +1,14 @@
 // Hex Designer Implementation
 function initializeHexDesigner() {
+    // Initialize color palettes with delete option for designer
+    initializeColorPalettes('#hex-designer-colors-controls', {
+        basic: { 
+            type: 'basic', 
+            additional: [{ color: 'delete', title: 'Delete Hex', special: 'delete' }] 
+        },
+        author: { type: 'author' }
+    });
+    
     let currentColor = '#ffffff';
     let hexRadius = 3;
     let hexData = new Map(); // Store hex colors by coordinates
