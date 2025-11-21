@@ -897,28 +897,16 @@ function initializeHexDesigner() {
             const color = hexData.get(coordKey) || 'transparent';
             hexElement.setAttribute('fill', color === 'transparent' ? 'none' : color);
             exportSvg.appendChild(hexElement);
-            
-            // Add symbols if present
-            const symbol = hexSymbolData.get(coordKey);
-            if (symbol) {
-                const symbolElements = hexBoard.querySelector(`#symbol-${coordKey.replace(/,/g, '_').replace(/-/g, 'n')}`);
-                if (symbolElements) {
-                    const clonedSymbol = symbolElements.cloneNode(true);
-                    exportSvg.appendChild(clonedSymbol);
-                }
-            }
         });
         
-        // Add lines that connect active hexes
-        lineData.forEach((lineInfo) => {
-            if (activeHexes.has(lineInfo.startCoord) && activeHexes.has(lineInfo.endCoord)) {
-                const [startQ, startR] = lineInfo.startCoord.split(',').map(Number);
-                const [endQ, endR] = lineInfo.endCoord.split(',').map(Number);
-                const startPixel = hexToPixel(startQ, startR, hexSize);
-                const endPixel = hexToPixel(endQ, endR, hexSize);
-                const lineElement = createLineElement(startPixel, endPixel, lineInfo.color, lineInfo.width, lineInfo.type, true);
-                exportSvg.appendChild(lineElement);
-            }
+        // Add overlays (symbols and lines) in visual order from the editor
+        const overlayNodes = Array.from(hexBoard.children).filter(el => {
+            if (!el.id) return false;
+            if (el.id === 'line-preview') return false;
+            return el.id.startsWith('symbol-') || el.id.startsWith('line-');
+        });
+        overlayNodes.forEach(el => {
+            exportSvg.appendChild(el.cloneNode(true));
         });
         
         
