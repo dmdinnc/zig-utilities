@@ -864,26 +864,42 @@ function initializeHexDesigner() {
         const minY = centerY - radius;
         const maxY = centerY + radius;
         
-        const exportWidth = maxX - minX;
-        const exportHeight = maxY - minY;
+        const contentWidth = maxX - minX;
+        const contentHeight = maxY - minY;
         const offsetX = -minX;
         const offsetY = -minY;
+        
+        // Fixed export size for consistent card game images
+        const exportWidth = 255;
+        const exportHeight = 255;
+        
+        // Calculate scaling to fit content in 255x255 while maintaining aspect ratio
+        const scale = Math.min(exportWidth / contentWidth, exportHeight / contentHeight);
+        const scaledWidth = contentWidth * scale;
+        const scaledHeight = contentHeight * scale;
+        
+        // Center the content in the 255x255 canvas
+        const centerOffsetX = (exportWidth - scaledWidth) / 2;
+        const centerOffsetY = (exportHeight - scaledHeight) / 2;
         
         // Create export SVG
         const exportSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         exportSvg.setAttribute('width', exportWidth);
         exportSvg.setAttribute('height', exportHeight);
-        exportSvg.setAttribute('viewBox', `${-offsetX} ${-offsetY} ${exportWidth} ${exportHeight}`);
+        exportSvg.setAttribute('viewBox', `0 0 ${exportWidth} ${exportHeight}`);
+        
+        // Create a group for all content with transform to scale and center
+        const contentGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        contentGroup.setAttribute('transform', `translate(${centerOffsetX + offsetX * scale}, ${centerOffsetY + offsetY * scale}) scale(${scale})`);
         
         // Add black circular background
-        
         const circleElement = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         circleElement.setAttribute('cx', centerX);
         circleElement.setAttribute('cy', centerY);
         circleElement.setAttribute('r', radius);
         circleElement.setAttribute('fill', '#000000');
         circleElement.setAttribute('stroke', 'none');
-        exportSvg.appendChild(circleElement);
+        contentGroup.appendChild(circleElement);
         
         // Draw active hexes
         activeHexes.forEach(coordKey => {
@@ -896,7 +912,7 @@ function initializeHexDesigner() {
             hexElement.setAttribute('stroke-width', '1');
             const color = hexData.get(coordKey) || 'transparent';
             hexElement.setAttribute('fill', color === 'transparent' ? 'none' : color);
-            exportSvg.appendChild(hexElement);
+            contentGroup.appendChild(hexElement);
         });
         
         // Add overlays (symbols and lines) in visual order from the editor
@@ -906,8 +922,11 @@ function initializeHexDesigner() {
             return el.id.startsWith('symbol-') || el.id.startsWith('line-');
         });
         overlayNodes.forEach(el => {
-            exportSvg.appendChild(el.cloneNode(true));
+            contentGroup.appendChild(el.cloneNode(true));
         });
+        
+        // Add the content group to the SVG
+        exportSvg.appendChild(contentGroup);
         
         
         // Convert to PNG

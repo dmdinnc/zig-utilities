@@ -948,11 +948,9 @@ function initializeHexBoardEditor() {
             currentFilename += '.png';
         }
         
-        // Optimized export settings for card game corner images
-        const scaleFactor = 0.8; // Further reduced for very small card corner images
-        const svgRect = hexBoard.getBoundingClientRect();
-        const exportWidth = Math.min(200, svgRect.width * scaleFactor); // Much smaller for card corners
-        const exportHeight = Math.min(200, svgRect.height * scaleFactor);
+        // Fixed export size for consistent card game images
+        const exportWidth = 255;
+        const exportHeight = 255;
         
         // Create high-resolution SVG with explicit dimensions
         const svgElement = hexBoard.cloneNode(true);
